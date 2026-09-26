@@ -1,5 +1,4 @@
-# GearGrid CI (spec 18.2). The database steps (postgres:17 service, bootstrap, migrate, roles, seed,
-# db:check) are added in step 1.
+# GearGrid CI (spec 18.2).
 name: CI
 
 on: [push, pull_request]
@@ -7,6 +6,21 @@ on: [push, pull_request]
 jobs:
   check:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: ci
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+    env: # throwaway values, local to the job's container; turbo.json lists them in globalPassThroughEnv (D57)
+      GEARGRID_ENV: ci
+      MIGRATION_DATABASE_URL: postgres://postgres:ci@localhost:5432/postgres
+      APP_API_PASSWORD: ci-app-api
+      DOKAAN_RO_PASSWORD: ci-dokaan-ro
+      DATABASE_URL: postgres://app_api:ci-app-api@localhost:5432/postgres # slice B
+      SEED_API_KEY: ggk_ci000000000000000000000000000000 # D22 format
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
@@ -17,4 +31,9 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck
       - run: npm run format:check
-      - run: npm run test
+      - run: psql "$MIGRATION_DATABASE_URL" -v ON_ERROR_STOP=1 -f supabase/bootstrap.sql
+      - run: npm run db:migrate
+      - run: npm run db:roles
+      - run: npm run db:seed
+      - run: npm run db:check
+      - run: npm run test # unit and database tests

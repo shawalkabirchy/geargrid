@@ -12,14 +12,22 @@
   "packageManager": "npm@11.14.1",
   "scripts": {
     "lint": "eslint .",
-    "typecheck": "turbo run typecheck",
-    "test": "turbo run test",
+    "typecheck": "turbo run typecheck && tsc --noEmit -p tsconfig.json",
+    "test": "turbo run test && vitest run --dir scripts --passWithNoTests --testTimeout=180000",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "db:generate": "drizzle-kit generate --config packages/db/drizzle.config.ts",
+    "db:migrate": "drizzle-kit migrate --config packages/db/drizzle.config.ts",
+    "db:roles": "node --env-file-if-exists=.env.local --import tsx scripts/db-roles.ts",
+    "db:seed": "node --env-file-if-exists=.env.local --import tsx supabase/seed/seed.ts",
+    "db:check": "node --env-file-if-exists=.env.local --import tsx scripts/db-check.ts",
+    "db:reset-demo": "node --env-file-if-exists=.env.local --import tsx scripts/db-reset-demo.ts"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
     "@types/node": "24.13.6",
+    "@types/pg": "8.23.1",
+    "drizzle-kit": "0.31.10",
     "eslint": "10.11.0",
     "prettier": "3.9.9",
     "turbo": "2.11.0",
@@ -27,5 +35,11 @@
     "typescript-eslint": "8.70.1",
     "vite": "8.3.0",
     "vitest": "5.0.1"
+  },
+  "dependencies": {
+    "drizzle-orm": "0.45.2",
+    "pg": "8.23.0",
+    "tsx": "4.23.15",
+    "zod": "4.6.5"
   }
 }

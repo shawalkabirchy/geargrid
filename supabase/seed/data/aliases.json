@@ -1,0 +1,162 @@
+[
+  {
+    "alias": "break",
+    "category": "Brakes"
+  },
+  {
+    "alias": "brek",
+    "category": "Brakes"
+  },
+  {
+    "alias": "ব্রেক",
+    "category": "Brakes"
+  },
+  {
+    "alias": "filter",
+    "category": "Filters"
+  },
+  {
+    "alias": "ফিল্টার",
+    "category": "Filters"
+  },
+  {
+    "alias": "plug",
+    "category": "Ignition"
+  },
+  {
+    "alias": "প্লাগ",
+    "category": "Ignition"
+  },
+  {
+    "alias": "shocker",
+    "category": "Suspension and steering"
+  },
+  {
+    "alias": "শকার",
+    "category": "Suspension and steering"
+  },
+  {
+    "alias": "light",
+    "category": "Lighting"
+  },
+  {
+    "alias": "বাত্তি",
+    "category": "Lighting"
+  },
+  {
+    "alias": "mobil",
+    "category": "Oils and fluids"
+  },
+  {
+    "alias": "মবিল",
+    "category": "Oils and fluids"
+  },
+  {
+    "alias": "clutch",
+    "category": "Clutch and transmission"
+  },
+  {
+    "alias": "radiator",
+    "category": "Cooling"
+  },
+  {
+    "alias": "belt",
+    "category": "Belts and hoses"
+  },
+  {
+    "alias": "electric",
+    "category": "Electrical"
+  },
+  {
+    "alias": "body",
+    "category": "Body parts"
+  },
+  {
+    "alias": "engine",
+    "category": "Engine parts"
+  },
+  {
+    "alias": "ইঞ্জিনের মাল",
+    "category": "Engine parts"
+  },
+  {
+    "alias": "samner pad",
+    "part": "AN-101WK"
+  },
+  {
+    "alias": "সামনের প্যাড",
+    "part": "04465-10010"
+  },
+  {
+    "alias": "pechoner lining",
+    "part": "AN-108WK"
+  },
+  {
+    "alias": "পেছনের লাইনিং",
+    "part": "AN-108WK"
+  },
+  {
+    "alias": "fan belt",
+    "part": "6PK1101"
+  },
+  {
+    "alias": "ফ্যানবেল্ট",
+    "part": "6PK1101"
+  },
+  {
+    "alias": "self",
+    "part": "LOC-STA-1004"
+  },
+  {
+    "alias": "সেলফ",
+    "part": "DNST-0101"
+  },
+  {
+    "alias": "dynamo",
+    "part": "LOC-ALT-1127"
+  },
+  {
+    "alias": "ডায়নামো",
+    "part": "LOC-ALT-1031"
+  },
+  {
+    "alias": "mobil filter",
+    "part": "90915-10010"
+  },
+  {
+    "alias": "মবিল ফিল্টার",
+    "part": "DNOI-0108"
+  },
+  {
+    "alias": "hawa filter",
+    "part": "DNAI-0150"
+  },
+  {
+    "alias": "চেইন সেট",
+    "part": "LOC-CHA-1232"
+  },
+  {
+    "alias": "chain set",
+    "part": "LOC-CHA-1244"
+  },
+  {
+    "alias": "iridium plug",
+    "part": "NGK-0101"
+  },
+  {
+    "alias": "cooling fan",
+    "part": "DNFA-0164"
+  },
+  {
+    "alias": "ac filter",
+    "part": "DNAC-0171"
+  },
+  {
+    "alias": "sliding roller",
+    "part": "LOC-ROL-1124"
+  },
+  {
+    "alias": "head light",
+    "part": "LOC-HEA-1034"
+  }
+]

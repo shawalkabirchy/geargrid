@@ -1,0 +1,32 @@
+[
+  {
+    "name": "Nawabpur Auto Parts Ltd.",
+    "phone": "02-7390001",
+    "address": "Nawabpur Road, Dhaka",
+    "kind": "car"
+  },
+  {
+    "name": "Bangshal Motor Supply",
+    "phone": "02-7390002",
+    "address": "Bangshal, Dhaka",
+    "kind": "car"
+  },
+  {
+    "name": "Japan Auto Parts Importer",
+    "phone": "02-7390003",
+    "address": "Tejgaon, Dhaka",
+    "kind": "car"
+  },
+  {
+    "name": "Dhaka Bike Parts Center",
+    "phone": "02-7390004",
+    "address": "Bangshal, Dhaka",
+    "kind": "motorcycle"
+  },
+  {
+    "name": "Eastern Lubricants",
+    "phone": "02-7390005",
+    "address": "Postogola, Dhaka",
+    "kind": "fluid"
+  }
+]

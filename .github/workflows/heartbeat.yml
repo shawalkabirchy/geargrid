@@ -1,0 +1,19 @@
+# Daily "select 1" against shop-dev, so the free Supabase project is never paused for inactivity (spec 7.4, 18.2).
+# The secret SHOP_DEV_DATABASE_URL uses the read-only user dokaanbondhu_ro.<project-ref> through the session pooler
+# and ends with ?sslmode=verify-full only; PGSSLROOTCERT points psql at the checked-out certificate (spec 4.2).
+name: Heartbeat
+
+on:
+  schedule:
+    - cron: "17 3 * * *" # every day at 09:17 in Dhaka
+  workflow_dispatch:
+
+jobs:
+  select-one:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - run: psql "$SHOP_DEV_DATABASE_URL" -v ON_ERROR_STOP=1 -c "select 1"
+        env:
+          SHOP_DEV_DATABASE_URL: ${{ secrets.SHOP_DEV_DATABASE_URL }}
+          PGSSLROOTCERT: ${{ github.workspace }}/certs/supabase-root-2021.crt

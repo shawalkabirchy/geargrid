@@ -1,0 +1,32 @@
+[
+  {
+    "name": "Cash box",
+    "kind": "cash",
+    "number": null,
+    "opening_balance_taka": 50000
+  },
+  {
+    "name": "bKash",
+    "kind": "bkash",
+    "number": "01711-000001",
+    "opening_balance_taka": 20000
+  },
+  {
+    "name": "Nagad",
+    "kind": "nagad",
+    "number": "01711-000001",
+    "opening_balance_taka": 5000
+  },
+  {
+    "name": "Rocket",
+    "kind": "rocket",
+    "number": "01711-0000012",
+    "opening_balance_taka": 2000
+  },
+  {
+    "name": "City Bank current account",
+    "kind": "bank",
+    "number": "1102-000000-001",
+    "opening_balance_taka": 300000
+  }
+]

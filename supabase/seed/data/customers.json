@@ -1,0 +1,202 @@
+[
+  {
+    "name": "Rahim Motors",
+    "type": "garage",
+    "phone": "01711-000101",
+    "address": "Tejgaon, Dhaka",
+    "credit_limit_taka": 50000,
+    "final_due_taka": 19200
+  },
+  {
+    "name": "Rahim Auto Garage",
+    "type": "garage",
+    "phone": "01711-000102",
+    "address": "Mirpur 10, Dhaka"
+  },
+  {
+    "name": "Karim Auto",
+    "type": "garage",
+    "phone": "01711-000103",
+    "address": "Moghbazar, Dhaka",
+    "credit_limit_taka": 40000,
+    "final_due_taka": 21900
+  },
+  {
+    "name": "New Dhaka Garage",
+    "type": "garage",
+    "phone": "01711-000104",
+    "address": "Jatrabari, Dhaka",
+    "credit_limit_taka": 40000,
+    "final_due_taka": 20500
+  },
+  {
+    "name": "Bismillah Motors",
+    "type": "garage",
+    "phone": "01711-000110",
+    "address": "Bangshal, Dhaka",
+    "credit_limit_taka": null
+  },
+  {
+    "name": "Mayer Doa Auto Works",
+    "type": "garage",
+    "phone": "01711-000111",
+    "address": "Shyampur, Dhaka",
+    "credit_limit_taka": 30000
+  },
+  {
+    "name": "Sonar Bangla Garage",
+    "type": "garage",
+    "phone": "01711-000112",
+    "address": "Badda, Dhaka",
+    "credit_limit_taka": 30000
+  },
+  {
+    "name": "Tejgaon Auto Care",
+    "type": "garage",
+    "phone": "01711-000113",
+    "address": "Tejgaon, Dhaka",
+    "credit_limit_taka": null
+  },
+  {
+    "name": "Janata Auto",
+    "type": "garage",
+    "phone": "01711-000114",
+    "address": "Postogola, Dhaka",
+    "credit_limit_taka": 30000
+  },
+  {
+    "name": "Alif Motors",
+    "type": "garage",
+    "phone": "01711-000115",
+    "address": "Mohammadpur, Dhaka",
+    "credit_limit_taka": 30000
+  },
+  {
+    "name": "Shapla Garage",
+    "type": "garage",
+    "phone": "01711-000116",
+    "address": "Rampura, Dhaka",
+    "credit_limit_taka": null
+  },
+  {
+    "name": "Madina Auto Works",
+    "type": "garage",
+    "phone": "01711-000117",
+    "address": "Gabtoli, Dhaka",
+    "credit_limit_taka": 30000
+  },
+  {
+    "name": "Bhai Bhai Motors",
+    "type": "garage",
+    "phone": "01711-000118",
+    "address": "Keraniganj, Dhaka",
+    "credit_limit_taka": 30000
+  },
+  {
+    "name": "Mirpur Car Care",
+    "type": "garage",
+    "phone": "01711-000119",
+    "address": "Mirpur 1, Dhaka",
+    "credit_limit_taka": null
+  },
+  {
+    "name": "Uttara Auto Solution",
+    "type": "garage",
+    "phone": "01711-000120",
+    "address": "Uttara, Dhaka",
+    "credit_limit_taka": 30000
+  },
+  {
+    "name": "Friends Motor Workshop",
+    "type": "garage",
+    "phone": "01711-000121",
+    "address": "Khilgaon, Dhaka",
+    "credit_limit_taka": 30000
+  },
+  {
+    "name": "Kamal Hossain",
+    "type": "retail",
+    "phone": "01811-000201",
+    "address": "Dhaka"
+  },
+  {
+    "name": "Shafiqul Islam",
+    "type": "retail",
+    "phone": "01811-000202",
+    "address": "Dhaka"
+  },
+  {
+    "name": "Nasrin Akter",
+    "type": "retail",
+    "phone": "01811-000203",
+    "address": "Dhaka"
+  },
+  {
+    "name": "Tanvir Ahmed",
+    "type": "retail",
+    "phone": "01811-000204",
+    "address": "Dhaka"
+  },
+  {
+    "name": "Rafiq Uddin",
+    "type": "retail",
+    "phone": "01811-000205",
+    "address": "Dhaka"
+  },
+  {
+    "name": "Sumon Mia",
+    "type": "retail",
+    "phone": "01811-000206",
+    "address": "Dhaka"
+  },
+  {
+    "name": "Abdul Hannan",
+    "type": "retail",
+    "phone": "01811-000207",
+    "address": "Dhaka"
+  },
+  {
+    "name": "Farhana Yasmin",
+    "type": "retail",
+    "phone": "01811-000208",
+    "address": "Dhaka"
+  },
+  {
+    "name": "Jahid Hasan",
+    "type": "retail",
+    "phone": "01811-000209",
+    "address": "Dhaka"
+  },
+  {
+    "name": "Mizanur Rahman",
+    "type": "retail",
+    "phone": "01811-000210",
+    "address": "Dhaka"
+  },
+  {
+    "name": "Sabbir Hossain",
+    "type": "retail",
+    "phone": "01811-000211",
+    "address": "Dhaka"
+  },
+  {
+    "name": "Ruma Begum",
+    "type": "retail",
+    "phone": "01811-000212",
+    "address": "Dhaka"
+  },
+  {
+    "name": "Chattogram Parts House",
+    "type": "wholesale",
+    "phone": "01911-000301",
+    "address": "Chattogram",
+    "credit_limit_taka": 200000
+  },
+  {
+    "name": "Khulna Auto Parts Traders",
+    "type": "wholesale",
+    "phone": "01911-000302",
+    "address": "Khulna",
+    "credit_limit_taka": 150000
+  }
+]
