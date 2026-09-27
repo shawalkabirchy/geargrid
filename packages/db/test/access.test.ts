@@ -86,14 +86,16 @@ describe.skipIf(!inCi)("database access (slice A)", () => {
   });
 
   describe("dokaanbondhu_ro", () => {
-    const readOnly = new pg.Client({
-      connectionString: urlFor(new URL(migrationUrl).pathname.slice(1) || "postgres", {
-        name: "dokaanbondhu_ro",
-        password: process.env.DOKAAN_RO_PASSWORD ?? "",
-      }),
-    });
+    let readOnly: pg.Client;
 
     beforeAll(async () => {
+      // built here, not while the tests are collected: a skipped run has no database address
+      readOnly = new pg.Client({
+        connectionString: urlFor(new URL(migrationUrl).pathname.slice(1) || "postgres", {
+          name: "dokaanbondhu_ro",
+          password: process.env.DOKAAN_RO_PASSWORD ?? "",
+        }),
+      });
       await readOnly.connect();
     });
 
