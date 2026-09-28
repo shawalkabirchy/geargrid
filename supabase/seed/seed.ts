@@ -64,7 +64,7 @@ export interface SeedOptions {
   now: Date; // history counts back from this time, so "yesterday" is always yesterday
 }
 
-const toPaisa = (taka: number) => BigInt(taka) * 100n;
+const toTaka = (taka: number) => BigInt(taka); // whole taka (D92)
 const normalizeNumber = (value: string) => value.toUpperCase().replace(/[\s-]/g, "");
 
 async function sha256Hex(text: string): Promise<string> {
@@ -115,7 +115,7 @@ export async function seedInto(executor: Executor, options: SeedOptions): Promis
         language: "bn",
         banglaDigits: true,
         roundOffRule: 1,
-        defaultCreditLimit: toPaisa(30000),
+        defaultCreditLimit: toTaka(30000),
         defaultReorderLevel: "2.000",
         updatedAt: start,
       },
@@ -202,10 +202,10 @@ export async function seedInto(executor: Executor, options: SeedOptions): Promis
       number: part.number,
       data: part,
       category: part.category,
-      retail: toPaisa(part.retail_taka),
-      garage: part.garage_taka === null ? null : toPaisa(part.garage_taka),
-      wholesale: part.wholesale_taka === null ? null : toPaisa(part.wholesale_taka),
-      avgCost: toPaisa(part.cost_taka),
+      retail: toTaka(part.retail_taka),
+      garage: part.garage_taka === null ? null : toTaka(part.garage_taka),
+      wholesale: part.wholesale_taka === null ? null : toTaka(part.wholesale_taka),
+      avgCost: toTaka(part.cost_taka),
       stock: 0n,
       opening: 0n,
       exactStock: part.stock === undefined ? null : BigInt(part.stock) * 1000n,
@@ -222,10 +222,10 @@ export async function seedInto(executor: Executor, options: SeedOptions): Promis
       unit: part.unit,
       packSize: part.pack_size === null ? null : formatQuantity(BigInt(Math.round(part.pack_size * 1000))),
       rackLocation: part.rack,
-      retailPrice: toPaisa(part.retail_taka),
-      garagePrice: part.garage_taka === null ? null : toPaisa(part.garage_taka),
-      wholesalePrice: part.wholesale_taka === null ? null : toPaisa(part.wholesale_taka),
-      avgCost: toPaisa(part.cost_taka),
+      retailPrice: toTaka(part.retail_taka),
+      garagePrice: part.garage_taka === null ? null : toTaka(part.garage_taka),
+      wholesalePrice: part.wholesale_taka === null ? null : toTaka(part.wholesale_taka),
+      avgCost: toTaka(part.cost_taka),
       reorderLevel: formatQuantity(BigInt(Math.round(part.reorder_level * 1000))),
       notes: part.notes ?? null,
       isActive: part.active !== false,
@@ -293,7 +293,7 @@ export async function seedInto(executor: Executor, options: SeedOptions): Promis
       name: account.name,
       kind: account.kind,
       number: account.number,
-      openingBalance: toPaisa(account.opening_balance_taka),
+      openingBalance: toTaka(account.opening_balance_taka),
       ...stamp,
     });
   }
@@ -304,7 +304,7 @@ export async function seedInto(executor: Executor, options: SeedOptions): Promis
       name: customer.name,
       data: customer,
       tier: customer.type,
-      anchorDue: customer.final_due_taka === undefined ? null : toPaisa(customer.final_due_taka),
+      anchorDue: customer.final_due_taka === undefined ? null : toTaka(customer.final_due_taka),
       due: 0n,
       provisionalOpening: 0n,
       opening: 0n,
@@ -345,7 +345,7 @@ export async function seedInto(executor: Executor, options: SeedOptions): Promis
       reason: "opening",
       refType: null,
       refId: null,
-      unitCost: toPaisa(part.data.cost_taka),
+      unitCost: toTaka(part.data.cost_taka),
       ...stamp,
     });
   }
@@ -400,7 +400,7 @@ export async function seedInto(executor: Executor, options: SeedOptions): Promis
     priceTier: c.tier,
     phone: c.data.phone,
     address: c.data.address,
-    creditLimit: c.data.credit_limit_taka == null ? null : toPaisa(c.data.credit_limit_taka),
+    creditLimit: c.data.credit_limit_taka == null ? null : toTaka(c.data.credit_limit_taka),
     openingDue: c.opening,
     dueBalance: c.due,
     ...stamp,

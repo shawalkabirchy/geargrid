@@ -7,12 +7,10 @@ function groupDigits(digits: string): string {
   return `${head},${digits.slice(-3)}`;
 }
 
-/** Paisa as taka text: "4,500", "1,23,456.50", or with Bangla digits "৪,৫০০". Paisa show only when not zero. */
-export function formatTaka(paisa: bigint, options: { banglaDigits?: boolean } = {}): string {
-  const sign = paisa < 0n ? "-" : "";
-  const absolute = paisa < 0n ? -paisa : paisa;
-  const fraction = absolute % 100n;
-  let text = `${sign}${groupDigits((absolute / 100n).toString())}`;
-  if (fraction !== 0n) text += `.${fraction.toString().padStart(2, "0")}`;
+/** Whole taka as text: "4,500", "1,23,456", or with Bangla digits "৪,৫০০" (D92). */
+export function formatTaka(taka: bigint, options: { banglaDigits?: boolean } = {}): string {
+  const sign = taka < 0n ? "-" : "";
+  const absolute = taka < 0n ? -taka : taka;
+  const text = `${sign}${groupDigits(absolute.toString())}`;
   return options.banglaDigits ? text.replace(/\d/g, (digit) => BANGLA_DIGITS[Number(digit)] ?? digit) : text;
 }

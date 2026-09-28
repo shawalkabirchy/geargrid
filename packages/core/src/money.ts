@@ -1,6 +1,7 @@
 import { AppError } from "./errors";
 
-// All money is bigint paisa (1 taka = 100 paisa); quantities are bigint milli-units (spec 5.1, 6.7).
+// All money is bigint whole taka (spec 5.1, D92): every calculation rounds to the taka, half away from zero.
+// Quantities are bigint milli-units (spec 6.7).
 
 export type PriceTier = "retail" | "garage" | "wholesale";
 export type RoundOffStep = 1 | 5 | 10;
@@ -15,16 +16,16 @@ export function roundHalfAwayFromZero(numerator: bigint, divisor: bigint): bigin
   return quotient;
 }
 
-/** Value of a line: quantity in milli-units times the unit price, rounded to the paisa. */
+/** Value of a line: quantity in milli-units times the unit price, rounded to the taka. */
 export function lineValue(quantityMilli: bigint, unitPrice: bigint): bigint {
   return roundHalfAwayFromZero(quantityMilli * unitPrice, 1000n);
 }
 
 /** Rounds a total to 1, 5 or 10 taka; returns the rounded total and the signed adjustment. */
-export function roundOff(paisa: bigint, step: RoundOffStep): { rounded: bigint; adjustment: bigint } {
-  const unit = BigInt(step) * 100n;
-  const rounded = roundHalfAwayFromZero(paisa, unit) * unit;
-  return { rounded, adjustment: rounded - paisa };
+export function roundOff(taka: bigint, step: RoundOffStep): { rounded: bigint; adjustment: bigint } {
+  const unit = BigInt(step);
+  const rounded = roundHalfAwayFromZero(taka, unit) * unit;
+  return { rounded, adjustment: rounded - taka };
 }
 
 /** The price for a tier; an empty garage or wholesale price falls back to retail. */
@@ -37,15 +38,15 @@ export function tierPrice(
   return prices.retailPrice;
 }
 
-const TAKA_PATTERN = /^(-?)(\d+)(?:\.(\d{1,2}))?$/;
+const TAKA_PATTERN = /^(-?)(\d+)(?:\.0{1,2})?$/;
 
-/** "4500" or "4500.5" taka to paisa, exactly; more than two decimals is an error. */
-export function takaToPaisa(taka: string): bigint {
+/** "4500" (or "4500.00") taka as a bigint; an amount with paisa ("4500.50") is an error (D92). */
+export function parseTaka(taka: string): bigint {
   const match = TAKA_PATTERN.exec(taka.trim());
   if (!match) throw new AppError("INVALID_AMOUNT", 400, "errors.invalidAmount", { value: taka });
-  const [, sign, whole, fraction = ""] = match;
-  const paisa = BigInt(whole ?? "0") * 100n + BigInt(fraction.padEnd(2, "0"));
-  return sign === "-" ? -paisa : paisa;
+  const [, sign, whole] = match;
+  const value = BigInt(whole ?? "0");
+  return sign === "-" ? -value : value;
 }
 
 /** A bigint as a JSON number, only when it is a safe integer. */

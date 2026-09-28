@@ -3,7 +3,7 @@ import { bigint, integer, numeric, timestamp, uuid, type AnyPgColumn } from "dri
 
 // Shared column shapes and constraint helpers (spec 5.1).
 
-/** Money: bigint paisa, read and written as a JS bigint. */
+/** Money: bigint whole taka (D92), read and written as a JS bigint. */
 export const money = (name: string) => bigint(name, { mode: "bigint" });
 
 /** Quantities: numeric(12,3), read as text such as "3.000" (parse with parseQuantity). */

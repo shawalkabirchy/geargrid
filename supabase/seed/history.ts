@@ -26,11 +26,11 @@ const PURCHASES = 30;
 const SUPPLIER_PAYMENTS = 10;
 const RETURNS = 4;
 const VOIDS = 2;
-const OTHER_CUSTOMERS_MAX_DUE = 1_500_000n; // paisa: every customer but the anchors stays below this
+const OTHER_CUSTOMERS_MAX_DUE = 15_000n; // taka: every customer but the anchors stays below this
 
 const DAY_MS = 86_400_000;
 const DHAKA_OFFSET_MS = 6 * 3_600_000;
-const TAKA = 100n;
+const TAKA = 1n; // money is whole taka (D92)
 const UNIT = 1000n; // one unit in milli-units
 
 export interface HistoryPart extends PartRef {
@@ -157,7 +157,7 @@ function trxFor(random: Random, method: PaymentMethod): string | null {
   return method === "bank" ? `TT${code.slice(0, 8)}` : code;
 }
 
-/** Rounds a paisa amount down to whole units of `step` paisa. */
+/** Rounds an amount down to whole units of `step` taka. */
 const floorTo = (amount: bigint, step: bigint) => (amount / step) * step;
 
 function buildSale(random: Random, now: Date, parts: HistoryPart[], customers: HistoryCustomer[]): SaleEvent {
@@ -506,7 +506,7 @@ export async function runHistory(input: HistoryInput): Promise<{ book: Book; eve
     } else {
       customer.opening = customer.provisionalOpening;
       if (customer.due >= OTHER_CUSTOMERS_MAX_DUE) {
-        throw new Error(`seed history: ${customer.name} ends with a due of ${customer.due} paisa`);
+        throw new Error(`seed history: ${customer.name} ends with a due of ${customer.due} taka`);
       }
     }
   }

@@ -5,7 +5,7 @@ export {
   lineValue,
   roundHalfAwayFromZero,
   roundOff,
-  takaToPaisa,
+  parseTaka,
   tierPrice,
   toSafeNumber,
   type PriceTier,

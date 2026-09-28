@@ -32,7 +32,7 @@ type Row<T extends { $inferInsert: unknown }> = T["$inferInsert"];
 export interface PartRef {
   id: string;
   number: string;
-  avgCost: bigint; // paisa; changes with every purchase
+  avgCost: bigint; // whole taka; changes with every purchase
   stock: bigint; // milli-units
 }
 
