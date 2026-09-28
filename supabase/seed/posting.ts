@@ -456,6 +456,7 @@ export class Book {
     });
     for (const [index, line] of event.lines.entries()) {
       const oldQuantity = line.part.stock > 0n ? line.part.stock : 0n;
+      const avgCostBefore = line.part.avgCost; // saved on the line for a reversal (spec D93)
       line.part.avgCost =
         oldQuantity + line.quantity === 0n
           ? line.unitCost
@@ -470,6 +471,7 @@ export class Book {
         quantity: formatQuantity(line.quantity),
         unitCost: line.unitCost,
         lineTotal: lineValue(line.quantity, line.unitCost),
+        avgCostBefore,
         ...this.stamp(event.time),
       });
       await this.movement(

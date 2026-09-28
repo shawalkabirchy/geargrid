@@ -94,11 +94,15 @@ export const purchaseItems = pgTable(
     quantity: quantity("quantity").notNull(),
     unitCost: money("unit_cost").notNull(),
     lineTotal: money("line_total").notNull(),
+    // The part's average cost just before this line: a reversal puts it back when nothing has moved the part since
+    // (spec D93).
+    avgCostBefore: money("avg_cost_before").notNull(),
   },
   (t) => [
     check("purchase_items_quantity_check", positive(t.quantity)),
     check("purchase_items_unit_cost_check", nonNegative(t.unitCost)),
     check("purchase_items_line_total_check", nonNegative(t.lineTotal)),
+    check("purchase_items_avg_cost_before_check", nonNegative(t.avgCostBefore)),
     index("purchase_items_purchase_id_idx").on(t.purchaseId),
     index("purchase_items_part_id_idx").on(t.partId),
   ],

@@ -15,6 +15,13 @@
       "when": 1790370681944,
       "tag": "0001_roles_grants_rls",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790607739845,
+      "tag": "0002_purchase_avg_cost_before",
+      "breakpoints": true
     }
   ]
 }
