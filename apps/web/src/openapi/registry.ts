@@ -490,6 +490,86 @@ registry.registerPath({
   },
 });
 
+export const returnInput = registry.register(
+  "ReturnInput",
+  z.object({
+    sale_id: z.uuid(),
+    items: z
+      .array(z.object({ sale_item_id: z.uuid(), quantity, restock: z.enum(["yes", "damaged"]).optional() }))
+      .min(1),
+    refund_due_taka: z.number().int().nonnegative().optional(),
+    refund_cash_taka: z.number().int().nonnegative().optional(),
+    account_id: z.uuid().optional(),
+    reason: z.string().trim().min(1).max(200).optional(),
+    return_time: time.optional(),
+  }),
+);
+
+const returnSchema = registry.register(
+  "Return",
+  z.object({
+    id: z.uuid().nullable(),
+    sale_id: z.uuid(),
+    customer_id: z.uuid().nullable(),
+    return_time: z.string(),
+    total_taka: z.number().int(),
+    refund_due_taka: z.number().int().nullable(),
+    refund_cash_taka: z.number().int().nullable(),
+    account_id: z.uuid().nullable(),
+    reason: z.string().nullable(),
+    items: z.array(
+      z.object({
+        id: z.uuid().nullable(),
+        sale_item_id: z.uuid(),
+        part_id: z.uuid(),
+        quantity: z.number(),
+        unit_price_taka: z.number().int(),
+        restock: z.enum(["yes", "damaged"]),
+      }),
+    ),
+  }),
+);
+
+const returnAnswer = registry.register(
+  "ReturnAnswer",
+  z.object({
+    return: returnSchema,
+    customer: customerBalance,
+    warnings: z.array(warningSchema),
+    dry_run: z.boolean(),
+  }),
+);
+
+registry.registerPath({
+  method: "post",
+  path: "/api/v1/returns",
+  operationId: "recordReturn",
+  summary:
+    "Record a return against a sale; ?dry_run=true without the refund amounts gives the total and the customer's due",
+  security,
+  request: { query: dryRunQuery, headers: idempotencyHeader, body: { content: json(returnInput) } },
+  responses: {
+    201: { description: "The return was saved", content: json(returnAnswer) },
+    200: { description: "Dry run: what the return would be", content: json(returnAnswer) },
+    ...errorResponses(400, 401, 403, 404, 409, 422),
+  },
+  "x-supports-dry-run": true,
+  "x-read-back": { operation: "getReturn", id_from: "return.id" },
+});
+
+registry.registerPath({
+  method: "get",
+  path: "/api/v1/returns/{id}",
+  operationId: "getReturn",
+  summary: "Read a return by ID",
+  security,
+  request: { params: idParams },
+  responses: {
+    200: { description: "The return", content: json(z.object({ return: returnSchema })) },
+    ...errorResponses(400, 401, 403, 404),
+  },
+});
+
 /** The OpenAPI 3.1 document served at /api/openapi.json. */
 export function buildOpenApiDocument() {
   return new OpenApiGeneratorV31(registry.definitions).generateDocument({
