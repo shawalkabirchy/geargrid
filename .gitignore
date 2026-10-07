@@ -14,5 +14,9 @@ __pycache__/
 *.jks
 *.keystore
 
+# written again by every `next dev` (Next.js 16 notes for AI agents)
+apps/web/AGENTS.md
+apps/web/CLAUDE.md
+
 # TypeScript build caches
 *.tsbuildinfo

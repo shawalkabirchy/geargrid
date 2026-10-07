@@ -1,0 +1,28 @@
+{
+  "name": "@geargrid/web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev -p 3000",
+    "build": "next build",
+    "start": "next start -p 3000",
+    "typecheck": "next typegen && tsc --noEmit -p tsconfig.json",
+    "test": "vitest run --passWithNoTests --testTimeout=120000"
+  },
+  "dependencies": {
+    "@asteasolutions/zod-to-openapi": "9.1.0",
+    "@geargrid/core": "*",
+    "@geargrid/db": "*",
+    "drizzle-orm": "0.45.2",
+    "next": "16.3.5",
+    "pg": "8.23.0",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "zod": "4.6.5"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.7"
+  }
+}
