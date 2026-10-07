@@ -570,11 +570,115 @@ registry.registerPath({
   },
 });
 
+const nullablePrice = z.number().int().nonnegative().nullable();
+
+export const priceInput = registry.register(
+  "PriceInput",
+  z
+    .object({
+      retail_price_taka: z.number().int().nonnegative().optional(),
+      garage_price_taka: nullablePrice.optional(),
+      wholesale_price_taka: nullablePrice.optional(),
+    })
+    .refine((body) => Object.values(body).some((value) => value !== undefined), "at least one price"),
+);
+
+const prices = z.object({
+  retail_price_taka: z.number().int(),
+  garage_price_taka: z.number().int().nullable(),
+  wholesale_price_taka: z.number().int().nullable(),
+});
+
+registry.registerPath({
+  method: "patch",
+  path: "/api/v1/parts/{id}/price",
+  operationId: "updatePrice",
+  summary:
+    "Change a part's retail, garage or wholesale price; the answer keeps the previous prices for an undo",
+  security,
+  request: { params: idParams, body: { content: json(priceInput) } },
+  responses: {
+    200: {
+      description: "The new prices and the previous ones",
+      content: json(z.object({ part: prices.extend({ id: z.uuid() }), previous: prices })),
+    },
+    ...errorResponses(400, 401, 403, 404),
+  },
+  "x-compensating-operation": {
+    operation: "updatePrice",
+    id_from: "part.id",
+    body: {
+      retail_price_taka: "{previous.retail_price_taka}",
+      garage_price_taka: "{previous.garage_price_taka}",
+      wholesale_price_taka: "{previous.wholesale_price_taka}",
+    },
+  },
+  "x-read-back": { operation: "getPart", id_from: "part.id" },
+});
+
+export const fitmentInput = registry.register(
+  "FitmentInput",
+  z.object({
+    part_id: z.uuid(),
+    vehicle_id: z.uuid(),
+    note: z.string().trim().min(1).max(500).optional(),
+    verified: z.boolean().optional(),
+  }),
+);
+
+export const fitmentChange = registry.register(
+  "FitmentChange",
+  z.object({
+    deleted: z.literal(true).optional(),
+    note: z.string().trim().min(1).max(500).optional(),
+    verified: z.boolean().optional(),
+  }),
+);
+
+registry.registerPath({
+  method: "post",
+  path: "/api/v1/fitments",
+  operationId: "addFitment",
+  summary: "Record that a part fits a vehicle",
+  security,
+  request: { headers: idempotencyHeader, body: { content: json(fitmentInput) } },
+  responses: {
+    201: { description: "The new link", content: json(z.object({ fitment: fitmentSchema })) },
+    ...errorResponses(400, 401, 403, 404, 409),
+  },
+  "x-compensating-operation": { operation: "updateFitment", id_from: "fitment.id", body: { deleted: true } },
+  "x-read-back": { operation: "getFitment", id_from: "fitment.id" },
+});
+
+registry.registerPath({
+  method: "patch",
+  path: "/api/v1/fitments/{id}",
+  operationId: "updateFitment",
+  summary: "Edit a fitment link, or remove it with { deleted: true }",
+  security,
+  request: { params: idParams, body: { content: json(fitmentChange) } },
+  responses: {
+    200: { description: "The link", content: json(z.object({ fitment: fitmentSchema })) },
+    ...errorResponses(400, 401, 403, 404),
+  },
+});
+
 /** The OpenAPI 3.1 document served at /api/openapi.json. */
 export function buildOpenApiDocument() {
-  return new OpenApiGeneratorV31(registry.definitions).generateDocument({
+  const document = new OpenApiGeneratorV31(registry.definitions).generateDocument({
     openapi: "3.1.0",
     info: { title: "GearGrid API", version: API_VERSION },
     servers: [{ url: "/" }],
   });
+  // The generic hints at the root (spec 6.9, D25): what DokaanBondhu proposes as this host's feature list. The generator
+  // has no place for a root extension, so it is added here.
+  return {
+    ...document,
+    "x-host-features": {
+      dry_run: "?dry_run=true",
+      idempotency_header: "Idempotency-Key",
+      bangla_errors: "error.message_bn",
+      acting_user_header: "X-Acting-User",
+    },
+  };
 }
