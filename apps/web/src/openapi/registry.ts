@@ -386,6 +386,110 @@ registry.registerPath({
   },
 });
 
+export const purchaseInput = registry.register(
+  "PurchaseInput",
+  z.object({
+    supplier_id: z.uuid(),
+    bill_no: z.string().trim().min(1).max(64).optional(),
+    purchase_time: time.optional(),
+    items: z
+      .array(z.object({ part_id: z.uuid(), quantity, unit_cost_taka: z.number().int().nonnegative() }))
+      .min(1),
+    payments: z.array(paymentInput).default([]),
+  }),
+);
+
+const purchaseSchema = registry.register(
+  "Purchase",
+  z.object({
+    id: z.uuid(),
+    supplier_id: z.uuid(),
+    bill_no: z.string().nullable(),
+    purchase_time: z.string(),
+    total_taka: z.number().int(),
+    paid_taka: z.number().int(),
+    due_taka: z.number().int(),
+    status: z.enum(["completed", "reversed"]),
+    reversal_reason: z.string().nullable(),
+    items: z.array(
+      z.object({
+        id: z.uuid(),
+        part_id: z.uuid(),
+        quantity: z.number(),
+        unit_cost_taka: z.number().int(),
+        line_total_taka: z.number().int(),
+      }),
+    ),
+    payments: z.array(
+      z.object({
+        id: z.uuid(),
+        method: z.string(),
+        amount_taka: z.number().int(),
+        account_id: z.uuid().nullable(),
+        trx_id: z.string().nullable(),
+        cheque_id: z.uuid().nullable(),
+      }),
+    ),
+  }),
+);
+
+const purchaseAnswer = registry.register(
+  "PurchaseAnswer",
+  z.object({
+    purchase: purchaseSchema,
+    supplier: z.object({ id: z.uuid(), payable_balance_taka: z.number().int() }),
+    warnings: z.array(warningSchema),
+    dry_run: z.boolean(),
+  }),
+);
+
+registry.registerPath({
+  method: "post",
+  path: "/api/v1/purchases",
+  operationId: "stockIn",
+  summary: "Record a purchase from a supplier (stock in); ?dry_run=true checks it without saving",
+  security,
+  request: { query: dryRunQuery, headers: idempotencyHeader, body: { content: json(purchaseInput) } },
+  responses: {
+    201: { description: "The purchase was saved", content: json(purchaseAnswer) },
+    200: { description: "Dry run: what the purchase would be", content: json(purchaseAnswer) },
+    ...errorResponses(400, 401, 403, 404, 422),
+  },
+  "x-supports-dry-run": true,
+  "x-compensating-operation": {
+    operation: "reversePurchase",
+    id_from: "purchase.id",
+    body: { reason: "{undo_reason}" },
+  },
+  "x-read-back": { operation: "getPurchase", id_from: "purchase.id" },
+});
+
+registry.registerPath({
+  method: "post",
+  path: "/api/v1/purchases/{id}/reverse",
+  operationId: "reversePurchase",
+  summary: "Reverse a purchase: stock, payable and money go back",
+  security,
+  request: { params: idParams, headers: idempotencyHeader, body: { content: json(reasonBody) } },
+  responses: {
+    200: { description: "The reversed purchase", content: json(purchaseAnswer) },
+    ...errorResponses(400, 401, 403, 404, 409, 422),
+  },
+});
+
+registry.registerPath({
+  method: "get",
+  path: "/api/v1/purchases/{id}",
+  operationId: "getPurchase",
+  summary: "Read a purchase by ID",
+  security,
+  request: { params: idParams },
+  responses: {
+    200: { description: "The purchase", content: json(z.object({ purchase: purchaseSchema })) },
+    ...errorResponses(400, 401, 403, 404),
+  },
+});
+
 /** The OpenAPI 3.1 document served at /api/openapi.json. */
 export function buildOpenApiDocument() {
   return new OpenApiGeneratorV31(registry.definitions).generateDocument({
