@@ -1,0 +1,38 @@
+{
+  "errors": {
+    "VALIDATION_FAILED": "The request is not valid.",
+    "UNAUTHORIZED": "The API key is missing, unknown or revoked.",
+    "FORBIDDEN_SCOPE": "This API key may not do this.",
+    "CUSTOM_PRICE_FORBIDDEN": "A price other than the customer's own price needs the price permission.",
+    "NOT_FOUND": "Not found.",
+    "SALE_ALREADY_VOID": "This sale is already cancelled.",
+    "SALE_HAS_RETURNS": "A sale with returns cannot be cancelled.",
+    "SALE_IS_VOID": "A cancelled sale cannot take a return.",
+    "PAYMENT_ALREADY_REVERSED": "This payment is already reversed.",
+    "PURCHASE_ALREADY_REVERSED": "This purchase is already reversed.",
+    "FITMENT_EXISTS": "This part is already linked to this vehicle.",
+    "IDEMPOTENCY_KEY_REUSED": "This Idempotency-Key was already used with a different request.",
+    "ACCOUNT_REQUIRED": "Several accounts take this payment method; name one.",
+    "ACCOUNT_INVALID": "This account is inactive or of another kind.",
+    "CHEQUE_DETAILS_REQUIRED": "A cheque needs its bank, number and due date.",
+    "PAYMENTS_EXCEED_TOTAL": "The payments add up to more than the total.",
+    "WALK_IN_CANNOT_HAVE_DUE": "A sale without a customer cannot leave a due.",
+    "PAYMENT_EXCEEDS_DUE": "The payment is more than the customer's due.",
+    "DISCOUNT_TOO_HIGH": "The discount is more than the subtotal.",
+    "PART_NOT_AVAILABLE": "This part is no longer in the catalog.",
+    "RETURN_QTY_TOO_HIGH": "More is returned than was sold on this line.",
+    "RETURN_REFUND_REQUIRED": "Say how the return is refunded: how much from the due and how much in cash.",
+    "RETURN_REFUND_MISMATCH": "The two refund parts do not add up to the return's total.",
+    "REFUND_DUE_EXCEEDS_BALANCE": "More would be taken off the due than the customer owes.",
+    "VOID_EXCEEDS_DUE": "A payment came in after this sale, so it cannot be cancelled; record a return instead.",
+    "REVERSAL_EXCEEDS_PAYABLE": "A payment was made after this purchase, so it cannot be reversed.",
+    "INTERNAL": "Something went wrong."
+  },
+  "warnings": {
+    "LOW_STOCK": "The stock of a part goes below zero.",
+    "OVER_CREDIT_LIMIT": "The customer's due is now over the credit limit.",
+    "INACTIVE_PART": "A part marked inactive was sold.",
+    "TRX_ID_MISSING": "A mobile payment has no transaction ID.",
+    "AVG_COST_KEPT": "The part was bought or sold since, so its average cost stays as it is."
+  }
+}
