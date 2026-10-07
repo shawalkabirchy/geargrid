@@ -308,6 +308,84 @@ registry.registerPath({
 
 export const reasonInput = reasonBody;
 
+export const customerPaymentInput = registry.register(
+  "CustomerPaymentInput",
+  paymentInput.extend({ customer_id: z.uuid(), received_at: time.optional() }),
+);
+
+const customerPaymentSchema = registry.register(
+  "CustomerPayment",
+  z.object({
+    id: z.uuid(),
+    customer_id: z.uuid(),
+    amount_taka: z.number().int(),
+    method: z.string(),
+    account_id: z.uuid().nullable(),
+    trx_id: z.string().nullable(),
+    cheque_id: z.uuid().nullable(),
+    received_at: z.string(),
+    status: z.enum(["completed", "reversed"]),
+    reversal_reason: z.string().nullable(),
+  }),
+);
+
+const paymentAnswer = registry.register(
+  "CustomerPaymentAnswer",
+  z.object({
+    payment: customerPaymentSchema,
+    customer: customerBalance,
+    warnings: z.array(warningSchema),
+    dry_run: z.boolean(),
+  }),
+);
+
+registry.registerPath({
+  method: "post",
+  path: "/api/v1/customer-payments",
+  operationId: "receivePayment",
+  summary: "Receive a payment from a customer against their due; ?dry_run=true checks it without saving",
+  security,
+  request: { query: dryRunQuery, headers: idempotencyHeader, body: { content: json(customerPaymentInput) } },
+  responses: {
+    201: { description: "The payment was saved", content: json(paymentAnswer) },
+    200: { description: "Dry run: what the payment would be", content: json(paymentAnswer) },
+    ...errorResponses(400, 401, 403, 404, 422),
+  },
+  "x-supports-dry-run": true,
+  "x-compensating-operation": {
+    operation: "reversePayment",
+    id_from: "payment.id",
+    body: { reason: "{undo_reason}" },
+  },
+  "x-read-back": { operation: "getPayment", id_from: "payment.id" },
+});
+
+registry.registerPath({
+  method: "post",
+  path: "/api/v1/customer-payments/{id}/reverse",
+  operationId: "reversePayment",
+  summary: "Reverse a customer payment: the due and the money go back",
+  security,
+  request: { params: idParams, headers: idempotencyHeader, body: { content: json(reasonBody) } },
+  responses: {
+    200: { description: "The reversed payment", content: json(paymentAnswer) },
+    ...errorResponses(400, 401, 403, 404, 409, 422),
+  },
+});
+
+registry.registerPath({
+  method: "get",
+  path: "/api/v1/customer-payments/{id}",
+  operationId: "getPayment",
+  summary: "Read a customer payment by ID",
+  security,
+  request: { params: idParams },
+  responses: {
+    200: { description: "The payment", content: json(z.object({ payment: customerPaymentSchema })) },
+    ...errorResponses(400, 401, 403, 404),
+  },
+});
+
 /** The OpenAPI 3.1 document served at /api/openapi.json. */
 export function buildOpenApiDocument() {
   return new OpenApiGeneratorV31(registry.definitions).generateDocument({

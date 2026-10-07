@@ -1,28 +1,22 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { runChecks } from "../../../scripts/db-check";
 import { POST as recordSale } from "../app/api/v1/sales/route";
 import { GET as getSale } from "../app/api/v1/sales/[id]/route";
 import { POST as voidSale } from "../app/api/v1/sales/[id]/void/route";
-import { call, createTestShop, inCi, NO_READ_KEY, type TestShop } from "./harness";
+import {
+  call,
+  createTestShop,
+  dueOfCustomer,
+  failedChecks,
+  fingerprintOf,
+  first,
+  inCi,
+  NO_READ_KEY,
+  stockOfPart,
+  type TestShop,
+} from "./harness";
 
 // Sales (spec 6.5-6.7, 6.10): the postings checked by db:check and directly, a dry run that leaves every business table
 // as it was, each error code a sale can give, the warnings, two sales of one part at once, and the void.
-
-const BUSINESS_TABLES = [
-  "sales",
-  "sale_items",
-  "sale_payments",
-  "customers",
-  "customer_ledger",
-  "stock_levels",
-  "stock_movements",
-  "account_transactions",
-  "cheques",
-  "invoice_counters",
-  "idempotency_keys",
-  "audit_logs",
-  "change_log",
-];
 
 describe.skipIf(!inCi)("sales", () => {
   let shop: TestShop;
@@ -30,37 +24,12 @@ describe.skipIf(!inCi)("sales", () => {
   const part = { id: "", stock: 0, avgCost: 0 };
   let saleId = "";
 
-  const one = async <T extends Record<string, unknown>>(sql: string, values: unknown[] = []) =>
-    (await shop.admin.query<T>(sql, values)).rows[0]!;
-  const stockOf = async (id: string) =>
-    Number(
-      (await one<{ quantity: string }>("select quantity from stock_levels where part_id = $1", [id]))
-        .quantity,
-    );
-  const dueOf = async (id: string) =>
-    Number(
-      (await one<{ due_balance: string }>("select due_balance from customers where id = $1", [id]))
-        .due_balance,
-    );
-  const checks = async () => {
-    const client = await shop.admin.connect();
-    try {
-      return (await runChecks(client)).filter((result) => result.rows.length > 0);
-    } finally {
-      client.release();
-    }
-  };
-  /** Every business table's row count and checksum. */
-  const fingerprint = async () => {
-    const out: Record<string, string> = {};
-    for (const table of BUSINESS_TABLES) {
-      const row = await one<{ n: string; sum: string | null }>(
-        `select count(*) as n, md5(string_agg(t::text, ',' order by t::text)) as sum from ${table} t`,
-      );
-      out[table] = `${row.n}:${row.sum}`;
-    }
-    return out;
-  };
+  const one = <T extends Record<string, unknown>>(sql: string, values: unknown[] = []) =>
+    first<T>(shop, sql, values);
+  const stockOf = (id: string) => stockOfPart(shop, id);
+  const dueOf = (id: string) => dueOfCustomer(shop, id);
+  const checks = () => failedChecks(shop);
+  const fingerprint = () => fingerprintOf(shop);
 
   beforeAll(async () => {
     shop = await createTestShop("sales");

@@ -4,6 +4,7 @@ import { migrate } from "drizzle-orm/node-postgres/migrator";
 import { createHash } from "node:crypto";
 import { fileURLToPath } from "node:url";
 import pg from "pg";
+import { runChecks } from "../../../scripts/db-check";
 import { seedDatabase } from "../../../supabase/seed/seed";
 import { closeDatabase } from "../src/server/db";
 
@@ -125,4 +126,94 @@ export async function call(
     body: (await response.json()) as Record<string, unknown>,
     headers: response.headers,
   };
+}
+
+/** The first row of a query on the test database. */
+export async function first<T extends Record<string, unknown>>(
+  shop: TestShop,
+  sql: string,
+  values: unknown[] = [],
+): Promise<T> {
+  return (await shop.admin.query<T>(sql, values)).rows[0]!;
+}
+
+export async function stockOfPart(shop: TestShop, partId: string): Promise<number> {
+  return Number(
+    (
+      await first<{ quantity: string }>(shop, "select quantity from stock_levels where part_id = $1", [
+        partId,
+      ])
+    ).quantity,
+  );
+}
+
+export async function dueOfCustomer(shop: TestShop, customerId: string): Promise<number> {
+  return Number(
+    (
+      await first<{ due_balance: string }>(shop, "select due_balance from customers where id = $1", [
+        customerId,
+      ])
+    ).due_balance,
+  );
+}
+
+export async function payableOfSupplier(shop: TestShop, supplierId: string): Promise<number> {
+  return Number(
+    (
+      await first<{ payable_balance: string }>(shop, "select payable_balance from suppliers where id = $1", [
+        supplierId,
+      ])
+    ).payable_balance,
+  );
+}
+
+/** The db:check rules (spec 5.6) that fail on the test database: an empty list when all hold. */
+export async function failedChecks(shop: TestShop) {
+  const client = await shop.admin.connect();
+  try {
+    return (await runChecks(client)).filter((result) => result.rows.length > 0);
+  } finally {
+    client.release();
+  }
+}
+
+/** Every table a write may touch, for the dry-run check (spec 6.10). */
+export const BUSINESS_TABLES = [
+  "sales",
+  "sale_items",
+  "sale_payments",
+  "customer_payments",
+  "customers",
+  "customer_ledger",
+  "suppliers",
+  "supplier_ledger",
+  "supplier_payments",
+  "purchases",
+  "purchase_items",
+  "returns",
+  "return_items",
+  "parts",
+  "fitments",
+  "stock_levels",
+  "stock_movements",
+  "accounts",
+  "account_transactions",
+  "cheques",
+  "invoice_counters",
+  "idempotency_keys",
+  "audit_logs",
+  "change_log",
+];
+
+/** Every business table's row count and checksum: a dry run must leave all of them as they were. */
+export async function fingerprintOf(shop: TestShop): Promise<Record<string, string>> {
+  const out: Record<string, string> = {};
+  for (const table of BUSINESS_TABLES) {
+    const row = await first<{ n: string; sum: string | null }>(
+      shop,
+      `select count(*) as n, md5(string_agg(t::text, ',' order by t::text)) as sum from ${table} t`,
+    );
+    out[table] = `${row.n}:${row.sum}`;
+  }
+  return out;
 }
