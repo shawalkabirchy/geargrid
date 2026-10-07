@@ -2,7 +2,8 @@ import {
   formatInvoiceNo,
   formatQuantity,
   lineValue,
-  roundHalfAwayFromZero,
+  newAverageCost,
+  returnTotal,
   type PriceTier,
 } from "@geargrid/core";
 import type {
@@ -23,8 +24,10 @@ import type {
   supplierPayments,
 } from "@geargrid/db";
 
-// The posting rules of spec 6.6, applied in memory to the seed's history. Slice B moves them to the API's
-// src/server/posting/ and the seed switches to that code; db:check guards both.
+// The posting rules of spec 6.6, applied in memory to the seed's history. The API posts the same rules inside its
+// transactions (apps/web/src/server/posting); the seed keeps this in-memory book, because it builds a whole history
+// before the opening dues are known, and shares the calculations of packages/core with the API (DokaanBondhu spec
+// D131). db:check guards both.
 
 export type PaymentMethod = (typeof PAYMENT_METHODS)[number];
 type Row<T extends { $inferInsert: unknown }> = T["$inferInsert"];
@@ -401,8 +404,7 @@ export class Book {
     const line = event.lines[lineIndex];
     const item = posted?.items[lineIndex];
     if (!posted || !line || !item) throw new Error("seed history: return before its sale");
-    const gross = lineValue(quantity, line.unitPrice);
-    const total = event.subtotal === 0n ? 0n : roundHalfAwayFromZero(gross * event.total, event.subtotal);
+    const total = returnTotal([{ quantityMilli: quantity, unitPrice: line.unitPrice }], event);
     const currentDue = event.customer?.due ?? 0n;
     const refundDue = total < currentDue ? total : currentDue;
     const refundCash = total - refundDue;
@@ -455,15 +457,8 @@ export class Book {
       ...this.stamp(event.time),
     });
     for (const [index, line] of event.lines.entries()) {
-      const oldQuantity = line.part.stock > 0n ? line.part.stock : 0n;
       const avgCostBefore = line.part.avgCost; // saved on the line for a reversal (spec D93)
-      line.part.avgCost =
-        oldQuantity + line.quantity === 0n
-          ? line.unitCost
-          : roundHalfAwayFromZero(
-              oldQuantity * line.part.avgCost + line.quantity * line.unitCost,
-              oldQuantity + line.quantity,
-            );
+      line.part.avgCost = newAverageCost(line.part.stock, line.part.avgCost, line.quantity, line.unitCost);
       this.purchaseItems.push({
         id: await this.id(`purchase_item:${n}:${index + 1}`),
         purchaseId,

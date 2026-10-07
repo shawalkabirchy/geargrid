@@ -12,4 +12,5 @@ export {
   type RoundOffStep,
 } from "./money";
 export { formatQuantity, parseQuantity } from "./quantity";
+export { newAverageCost, returnTotal, saleTotals, type Discount, type SaleTotals } from "./totals";
 export { uuidv5, uuidv7 } from "./uuid";

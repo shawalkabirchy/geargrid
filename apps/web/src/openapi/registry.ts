@@ -148,6 +148,166 @@ for (const [path, operationId, name, schema] of [
   });
 }
 
+// ---- Writes (spec 6.5). Money is whole taka (D92); quantities have at most three decimals.
+
+const quantity = z
+  .number()
+  .positive()
+  .refine((value) => Math.abs(value * 1000 - Math.round(value * 1000)) < 1e-6, "at most three decimals");
+const takaAmount = z.number().int().positive();
+const time = z.iso.datetime({ offset: true });
+const reasonBody = registry.register("Reason", z.object({ reason: z.string().trim().min(1).max(200) }));
+
+export const paymentInput = registry.register(
+  "PaymentInput",
+  z.object({
+    method: z.enum(["cash", "bkash", "nagad", "rocket", "bank", "cheque"]),
+    amount_taka: takaAmount,
+    account_id: z.uuid().optional(),
+    trx_id: z.string().trim().min(1).max(64).optional(),
+    cheque: z
+      .object({ bank: z.string().trim().min(1), cheque_no: z.string().trim().min(1), due_date: z.iso.date() })
+      .optional(),
+  }),
+);
+
+export const saleInput = registry.register(
+  "SaleInput",
+  z.object({
+    customer_id: z.uuid().nullable().optional(),
+    sale_time: time.optional(),
+    items: z
+      .array(
+        z.object({ part_id: z.uuid(), quantity, unit_price_taka: z.number().int().nonnegative().optional() }),
+      )
+      .min(1),
+    discount: z.object({ kind: z.enum(["amount", "percent"]), value: z.number().nonnegative() }).optional(),
+    payments: z.array(paymentInput).default([]),
+    note: z.string().max(500).optional(),
+  }),
+);
+
+const warningSchema = registry.register(
+  "Warning",
+  z.object({
+    code: z.enum(["LOW_STOCK", "OVER_CREDIT_LIMIT", "INACTIVE_PART", "TRX_ID_MISSING", "AVG_COST_KEPT"]),
+    message_en: z.string(),
+    message_bn: z.string(),
+    details: z.record(z.string(), z.unknown()),
+  }),
+);
+
+const customerBalance = z.object({ id: z.uuid(), due_balance_taka: z.number().int() }).nullable();
+
+const saleSchema = registry.register(
+  "Sale",
+  z.object({
+    id: z.uuid(),
+    invoice_no: z.string().nullable(),
+    customer_id: z.uuid().nullable(),
+    sale_time: z.string(),
+    subtotal_taka: z.number().int(),
+    discount_taka: z.number().int(),
+    round_off_taka: z.number().int(),
+    total_taka: z.number().int(),
+    paid_taka: z.number().int(),
+    due_taka: z.number().int(),
+    status: z.enum(["completed", "void"]),
+    void_reason: z.string().nullable(),
+    flags: z.array(z.string()),
+    note: z.string().nullable(),
+    items: z.array(
+      z.object({
+        id: z.uuid(),
+        part_id: z.uuid(),
+        quantity: z.number(),
+        unit_price_taka: z.number().int(),
+        list_price_taka: z.number().int(),
+        price_tier: z.string(),
+        line_total_taka: z.number().int(),
+      }),
+    ),
+    payments: z.array(
+      z.object({
+        id: z.uuid(),
+        method: z.string(),
+        amount_taka: z.number().int(),
+        account_id: z.uuid().nullable(),
+        trx_id: z.string().nullable(),
+        cheque_id: z.uuid().nullable(),
+      }),
+    ),
+  }),
+);
+
+const saleAnswer = registry.register(
+  "SaleAnswer",
+  z.object({
+    sale: saleSchema,
+    customer: customerBalance,
+    warnings: z.array(warningSchema),
+    dry_run: z.boolean(),
+  }),
+);
+
+const idempotencyHeader = z.object({
+  "Idempotency-Key": z
+    .string()
+    .regex(/^[A-Za-z0-9_-]{8,100}$/)
+    .optional(),
+  "X-Acting-User": z.string().min(1).max(100).optional(),
+});
+const dryRunQuery = z.object({ dry_run: z.enum(["true", "false"]).optional() });
+
+registry.registerPath({
+  method: "post",
+  path: "/api/v1/sales",
+  operationId: "recordSale",
+  summary: "Record a sale, on credit or paid; ?dry_run=true checks it and computes the totals without saving",
+  security,
+  request: { query: dryRunQuery, headers: idempotencyHeader, body: { content: json(saleInput) } },
+  responses: {
+    201: { description: "The sale was saved", content: json(saleAnswer) },
+    200: { description: "Dry run: what the sale would be", content: json(saleAnswer) },
+    ...errorResponses(400, 401, 403, 404, 422),
+  },
+  "x-supports-dry-run": true,
+  "x-compensating-operation": {
+    operation: "voidSale",
+    id_from: "sale.id",
+    body: { reason: "{undo_reason}" },
+  },
+  "x-read-back": { operation: "getSale", id_from: "sale.id" },
+});
+
+registry.registerPath({
+  method: "post",
+  path: "/api/v1/sales/{id}/void",
+  operationId: "voidSale",
+  summary: "Cancel a sale: stock, ledger and money go back",
+  security,
+  request: { params: idParams, headers: idempotencyHeader, body: { content: json(reasonBody) } },
+  responses: {
+    200: { description: "The cancelled sale", content: json(saleAnswer) },
+    ...errorResponses(400, 401, 403, 404, 409, 422),
+  },
+});
+
+registry.registerPath({
+  method: "get",
+  path: "/api/v1/sales/{id}",
+  operationId: "getSale",
+  summary: "Read a sale by ID",
+  security,
+  request: { params: idParams },
+  responses: {
+    200: { description: "The sale", content: json(z.object({ sale: saleSchema })) },
+    ...errorResponses(400, 401, 403, 404),
+  },
+});
+
+export const reasonInput = reasonBody;
+
 /** The OpenAPI 3.1 document served at /api/openapi.json. */
 export function buildOpenApiDocument() {
   return new OpenApiGeneratorV31(registry.definitions).generateDocument({
