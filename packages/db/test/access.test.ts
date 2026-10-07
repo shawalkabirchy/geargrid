@@ -46,6 +46,7 @@ describe.skipIf(!inCi)("database access (slice A)", () => {
     const database = `gg_empty_${Date.now()}`;
     await admin.query(`create database ${database}`);
     const pool = new pg.Pool({ connectionString: urlFor(database), max: 1 });
+    pool.on("error", () => undefined); // the forced drop below may cut a connection that is still closing
     try {
       await migrate(drizzle(pool), { migrationsFolder });
       const client = await pool.connect();
