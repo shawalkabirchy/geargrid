@@ -187,14 +187,16 @@
   },
   {
     "name": "Chattogram Parts House",
-    "type": "wholesale",
+    "type": "garage",
+    "bulk": true,
     "phone": "01911-000301",
     "address": "Chattogram",
     "credit_limit_taka": 200000
   },
   {
     "name": "Khulna Auto Parts Traders",
-    "type": "wholesale",
+    "type": "garage",
+    "bulk": true,
     "phone": "01911-000302",
     "address": "Khulna",
     "credit_limit_taka": 150000

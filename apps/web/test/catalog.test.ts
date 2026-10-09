@@ -9,7 +9,7 @@ import { call, createTestShop, failedChecks, first, inCi, NO_READ_KEY, type Test
 
 describe.skipIf(!inCi)("prices and fitments", () => {
   let shop: TestShop;
-  const part = { id: "", retail: 0, garage: null as number | null, wholesale: null as number | null };
+  const part = { id: "", retail: 0, garage: null as number | null };
   const link = { partId: "", vehicleId: "" };
 
   const errorCode = (answer: { body: Record<string, unknown> }) =>
@@ -17,19 +17,13 @@ describe.skipIf(!inCi)("prices and fitments", () => {
 
   beforeAll(async () => {
     shop = await createTestShop("catalog");
-    const row = await first<{
-      id: string;
-      retail_price: string;
-      garage_price: string | null;
-      wholesale_price: string | null;
-    }>(
+    const row = await first<{ id: string; retail_price: string; garage_price: string | null }>(
       shop,
-      "select id, retail_price, garage_price, wholesale_price from parts where deleted_at is null order by name_en limit 1",
+      "select id, retail_price, garage_price from parts where deleted_at is null order by name_en limit 1",
     );
     part.id = row.id;
     part.retail = Number(row.retail_price);
     part.garage = row.garage_price === null ? null : Number(row.garage_price);
-    part.wholesale = row.wholesale_price === null ? null : Number(row.wholesale_price);
     const pair = await first<{ part_id: string; vehicle_id: string }>(
       shop,
       `select p.id as part_id, v.id as vehicle_id from parts p cross join vehicles v
@@ -47,7 +41,6 @@ describe.skipIf(!inCi)("prices and fitments", () => {
     const previous = {
       retail_price_taka: part.retail,
       garage_price_taka: part.garage,
-      wholesale_price_taka: part.wholesale,
     };
     const changed = await call(updatePrice, {
       method: "PATCH",
@@ -60,7 +53,6 @@ describe.skipIf(!inCi)("prices and fitments", () => {
         id: part.id,
         retail_price_taka: part.retail + 100,
         garage_price_taka: null,
-        wholesale_price_taka: part.wholesale,
       },
       previous,
     });

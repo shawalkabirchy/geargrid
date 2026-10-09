@@ -38,7 +38,6 @@ export interface HistoryPart extends PartRef {
   category: string;
   retail: bigint;
   garage: bigint | null;
-  wholesale: bigint | null;
   exactStock: bigint | null; // milli-units, for anchors and edge rows
   opening: bigint; // milli-units, solved before posting
 }
@@ -135,16 +134,15 @@ const CATEGORY_WEIGHT: Record<string, number> = {
 
 function tierPriceOf(part: HistoryPart, tier: PriceTier): bigint {
   if (tier === "garage") return part.garage ?? part.retail;
-  if (tier === "wholesale") return part.wholesale ?? part.retail;
   return part.retail;
 }
 
-function saleQuantity(random: Random, part: HistoryPart, wholesale: boolean): bigint {
+function saleQuantity(random: Random, part: HistoryPart, bulk: boolean): bigint {
   let quantity: bigint;
   if (part.data.unit === "liter") quantity = BigInt(random.pick([1000, 2000, 3000, 3500, 4000]));
   else if (/spark plug|hub bolt/i.test(part.data.name_en)) quantity = BigInt(random.pick([1, 4, 4])) * UNIT;
   else quantity = BigInt(random.chance(0.8) ? 1 : 2) * UNIT;
-  return wholesale ? quantity * BigInt(random.int(4, 8)) : quantity;
+  return bulk ? quantity * BigInt(random.int(4, 8)) : quantity;
 }
 
 function paymentMethod(random: Random, weights: [PaymentMethod, number][]): PaymentMethod {
@@ -164,11 +162,9 @@ function buildSale(random: Random, now: Date, parts: HistoryPart[], customers: H
   const time = shopTime(random, now, HISTORY_DAYS, 1);
   const customer = random.chance(0.4)
     ? null
-    : random.weighted(customers, (c) =>
-        c.data.type === "garage" ? 3 : c.data.type === "wholesale" ? 1.5 : 1,
-      );
+    : random.weighted(customers, (c) => (c.data.bulk ? 1.5 : c.data.type === "garage" ? 3 : 1));
   const tier: PriceTier = customer?.tier ?? "retail";
-  const wholesale = customer?.data.type === "wholesale";
+  const bulk = customer?.data.bulk === true; // a trader: bulk quantities, a discount, paid by bank
   const pool = parts.filter(
     (part) => sellable(part) && !(customer?.name === "Karim Auto" && isFriction(part)),
   );
@@ -182,7 +178,7 @@ function buildSale(random: Random, now: Date, parts: HistoryPart[], customers: H
     if (lines.some((line) => line.part === part)) continue;
     lines.push({
       part,
-      quantity: saleQuantity(random, part, wholesale),
+      quantity: saleQuantity(random, part, bulk),
       unitPrice: tierPriceOf(part, tier),
       tier,
     });
@@ -191,17 +187,17 @@ function buildSale(random: Random, now: Date, parts: HistoryPart[], customers: H
   let discount = 0n;
   if (!customer && random.chance(0.12)) discount = BigInt(random.int(1, 4)) * 50n * TAKA;
   else if (!customer && random.chance(0.05)) discount = roundHalfAwayFromZero(subtotal * 500n, 10_000n);
-  else if (wholesale && random.chance(0.3)) discount = roundHalfAwayFromZero(subtotal * 300n, 10_000n);
+  else if (bulk && random.chance(0.3)) discount = roundHalfAwayFromZero(subtotal * 300n, 10_000n);
   if (discount * 5n > subtotal) discount = 0n;
   const { rounded: total, adjustment } = roundOff(subtotal - discount, 1);
 
   let paid = total;
   const roll = random.next();
   const partial = floorTo((total * BigInt(random.int(30, 70))) / 100n, 100n * TAKA);
-  if (customer?.data.type === "garage") paid = roll < 0.45 ? 0n : roll < 0.7 ? partial : total;
+  if (bulk) paid = roll < 0.5 ? partial : total;
+  else if (customer?.data.type === "garage") paid = roll < 0.45 ? 0n : roll < 0.7 ? partial : total;
   else if (customer?.data.type === "retail") paid = roll < 0.75 ? total : partial;
-  else if (wholesale) paid = roll < 0.5 ? partial : total;
-  const method = wholesale
+  const method = bulk
     ? "bank"
     : paymentMethod(random, [
         ["cash", 70],
@@ -325,11 +321,11 @@ export async function runHistory(input: HistoryInput): Promise<{ book: Book; eve
   for (const customer of customers) {
     let opening = 0n;
     if (customer.anchorDue === null) {
-      if (customer.data.type === "garage" && random.chance(0.6))
+      if (customer.data.bulk) opening = BigInt(random.int(10, 60)) * 100n * TAKA;
+      else if (customer.data.type === "garage" && random.chance(0.6))
         opening = BigInt(random.int(10, 70)) * 100n * TAKA;
       if (customer.data.type === "retail" && random.chance(0.2))
         opening = BigInt(random.int(5, 30)) * 100n * TAKA;
-      if (customer.data.type === "wholesale") opening = BigInt(random.int(10, 60)) * 100n * TAKA;
     }
     customer.provisionalOpening = opening;
     customer.due = opening;

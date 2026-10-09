@@ -27,8 +27,8 @@ export const STOCK_MOVEMENT_REASONS = [
 ] as const;
 export const STOCK_ADJUSTMENT_REASONS = ["count", "damage", "lost", "found"] as const;
 
-export const CUSTOMER_TYPES = ["retail", "garage", "wholesale"] as const;
-export const PRICE_TIERS = ["retail", "garage", "wholesale"] as const;
+export const CUSTOMER_TYPES = ["retail", "garage"] as const; // garage = the paikari price (D144)
+export const PRICE_TIERS = ["retail", "garage"] as const;
 export const CUSTOMER_LEDGER_ENTRIES = [
   "opening",
   "sale",

@@ -79,7 +79,7 @@ export const customerSchema = registry.register(
     id: z.uuid(),
     name: z.string(),
     type: z.string(),
-    price_tier: z.enum(["retail", "garage", "wholesale"]),
+    price_tier: z.enum(["retail", "garage"]),
     phone: z.string().nullable(),
     credit_limit_taka: nullableTaka,
     due_balance_taka: z.number().int(),
@@ -108,7 +108,6 @@ export const partSchema = registry.register(
     rack_location: z.string().nullable(),
     retail_price_taka: z.number().int(),
     garage_price_taka: nullableTaka,
-    wholesale_price_taka: nullableTaka,
     stock_quantity: z.number(),
     is_active: z.boolean(),
   }),
@@ -578,7 +577,6 @@ export const priceInput = registry.register(
     .object({
       retail_price_taka: z.number().int().nonnegative().optional(),
       garage_price_taka: nullablePrice.optional(),
-      wholesale_price_taka: nullablePrice.optional(),
     })
     .refine((body) => Object.values(body).some((value) => value !== undefined), "at least one price"),
 );
@@ -586,15 +584,13 @@ export const priceInput = registry.register(
 const prices = z.object({
   retail_price_taka: z.number().int(),
   garage_price_taka: z.number().int().nullable(),
-  wholesale_price_taka: z.number().int().nullable(),
 });
 
 registry.registerPath({
   method: "patch",
   path: "/api/v1/parts/{id}/price",
   operationId: "updatePrice",
-  summary:
-    "Change a part's retail, garage or wholesale price; the answer keeps the previous prices for an undo",
+  summary: "Change a part's retail or garage price; the answer keeps the previous prices for an undo",
   security,
   request: { params: idParams, body: { content: json(priceInput) } },
   responses: {
@@ -610,7 +606,6 @@ registry.registerPath({
     body: {
       retail_price_taka: "{previous.retail_price_taka}",
       garage_price_taka: "{previous.garage_price_taka}",
-      wholesale_price_taka: "{previous.wholesale_price_taka}",
     },
   },
   "x-read-back": { operation: "getPart", id_from: "part.id" },

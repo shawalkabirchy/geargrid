@@ -57,8 +57,7 @@ export const parts = pgTable(
     packSize: quantity("pack_size"),
     rackLocation: text("rack_location"),
     retailPrice: money("retail_price").notNull(),
-    garagePrice: money("garage_price"), // null = retail is used
-    wholesalePrice: money("wholesale_price"), // null = retail is used
+    garagePrice: money("garage_price"), // the paikari price (D144); null = retail is used
     avgCost: money("avg_cost")
       .notNull()
       .default(sql`0`),
@@ -74,7 +73,6 @@ export const parts = pgTable(
     check("parts_unit_check", oneOf(t.unit, PART_UNITS)),
     check("parts_retail_price_check", nonNegative(t.retailPrice)),
     check("parts_garage_price_check", nonNegative(t.garagePrice)),
-    check("parts_wholesale_price_check", nonNegative(t.wholesalePrice)),
     check("parts_avg_cost_check", nonNegative(t.avgCost)),
     index("parts_category_id_idx").on(t.categoryId),
     index("parts_brand_id_idx").on(t.brandId),

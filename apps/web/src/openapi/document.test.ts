@@ -103,7 +103,6 @@ describe("the OpenAPI document", () => {
         undo_body: {
           retail_price_taka: "{previous.retail_price_taka}",
           garage_price_taka: "{previous.garage_price_taka}",
-          wholesale_price_taka: "{previous.wholesale_price_taka}",
         },
         read_back: "getPart",
       },

@@ -38,7 +38,6 @@ export function partView(row: PartRow, stock: string | null) {
     rack_location: row.rackLocation,
     retail_price_taka: taka(row.retailPrice),
     garage_price_taka: takaOrNull(row.garagePrice),
-    wholesale_price_taka: takaOrNull(row.wholesalePrice),
     stock_quantity: quantityNumber(stock ?? "0"),
     is_active: row.isActive,
   };

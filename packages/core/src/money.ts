@@ -3,7 +3,7 @@ import { AppError } from "./errors";
 // All money is bigint whole taka (spec 5.1, D92): every calculation rounds to the taka, half away from zero.
 // Quantities are bigint milli-units (spec 6.7).
 
-export type PriceTier = "retail" | "garage" | "wholesale";
+export type PriceTier = "retail" | "garage";
 export type RoundOffStep = 1 | 5 | 10;
 
 /** numerator / divisor, rounded half away from zero. The divisor must be positive. */
@@ -28,13 +28,12 @@ export function roundOff(taka: bigint, step: RoundOffStep): { rounded: bigint; a
   return { rounded, adjustment: rounded - taka };
 }
 
-/** The price for a tier; an empty garage or wholesale price falls back to retail. */
+/** The price for a tier; an empty garage price falls back to retail. */
 export function tierPrice(
-  prices: { retailPrice: bigint; garagePrice: bigint | null; wholesalePrice: bigint | null },
+  prices: { retailPrice: bigint; garagePrice: bigint | null },
   tier: PriceTier,
 ): bigint {
   if (tier === "garage") return prices.garagePrice ?? prices.retailPrice;
-  if (tier === "wholesale") return prices.wholesalePrice ?? prices.retailPrice;
   return prices.retailPrice;
 }
 

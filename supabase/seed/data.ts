@@ -40,8 +40,7 @@ const partSchema = z.object({
   pack_size: z.number().positive().nullable(),
   rack: z.string().min(1),
   retail_taka: taka,
-  garage_taka: taka.nullable(),
-  wholesale_taka: taka.nullable(),
+  garage_taka: taka.nullable(), // the paikari price (D144)
   cost_taka: taka,
   reorder_level: z.number().nonnegative(),
   fits: z.array(z.string()),
@@ -64,6 +63,7 @@ const customerSchema = z.object({
   phone: z.string().min(1),
   address: z.string().min(1),
   credit_limit_taka: taka.nullable().optional(),
+  bulk: z.boolean().optional(), // a trader that buys in bulk by bank (history only)
   final_due_taka: taka.optional(), // anchors: the due after all generated history
 });
 const supplierSchema = z.object({

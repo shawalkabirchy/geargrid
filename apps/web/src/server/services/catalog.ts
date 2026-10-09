@@ -13,7 +13,6 @@ import { fitmentView } from "./reads";
 export interface PriceInput {
   retail_price_taka?: number | undefined;
   garage_price_taka?: number | null | undefined;
-  wholesale_price_taka?: number | null | undefined;
 }
 
 type PartRow = typeof parts.$inferSelect;
@@ -21,7 +20,6 @@ type PartRow = typeof parts.$inferSelect;
 const prices = (row: PartRow) => ({
   retail_price_taka: taka(row.retailPrice),
   garage_price_taka: takaOrNull(row.garagePrice),
-  wholesale_price_taka: takaOrNull(row.wholesalePrice),
 });
 
 /** `previous` is what an undo sends back (spec 6.5). */
@@ -43,9 +41,6 @@ export async function updatePrice({
   if (body.retail_price_taka !== undefined) change.retailPrice = BigInt(body.retail_price_taka);
   if (body.garage_price_taka !== undefined) {
     change.garagePrice = body.garage_price_taka === null ? null : BigInt(body.garage_price_taka);
-  }
-  if (body.wholesale_price_taka !== undefined) {
-    change.wholesalePrice = body.wholesale_price_taka === null ? null : BigInt(body.wholesale_price_taka);
   }
   const [updated] = await tx
     .update(parts)

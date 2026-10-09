@@ -37,12 +37,13 @@ describe("roundOff", () => {
 });
 
 describe("tierPrice", () => {
-  const part = { retailPrice: 1800n, garagePrice: 1600n, wholesalePrice: null };
+  const part = { retailPrice: 1800n, garagePrice: 1600n };
+  const noGarage = { retailPrice: 1800n, garagePrice: null };
 
   it("uses the tier's price, falling back to retail when it is empty", () => {
     expect(tierPrice(part, "retail")).toBe(1800n);
     expect(tierPrice(part, "garage")).toBe(1600n);
-    expect(tierPrice(part, "wholesale")).toBe(1800n);
+    expect(tierPrice(noGarage, "garage")).toBe(1800n);
   });
 });
 
