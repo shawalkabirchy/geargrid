@@ -1,0 +1,22 @@
+# GearGrid's write API, hosted for demos on Render (DokaanBondhu spec D161): the phone and DokaanBondhu's hosted
+# server reach the shop app's actions without the laptop. The same shop-dev database as on the laptop (seed data only),
+# as app_api. Not production. Deploys only with "Manual Deploy" before a demo, never on a push of unfinished work.
+# A free service sleeps after 15 quiet minutes and takes about a minute to wake, longer than DokaanBondhu waits for
+# the app (10 s): wake it before a demo (GET /api/v1/health).
+services:
+  - type: web
+    name: geargrid-api
+    runtime: node
+    plan: free
+    region: singapore
+    buildCommand: npm ci && npm run build -w apps/web
+    startCommand: cd apps/web && npx next start -p $PORT
+    healthCheckPath: /api/v1/health
+    autoDeployTrigger: "off"
+    envVars:
+      - key: NODE_VERSION
+        value: "24"
+      # Typed into Render, never committed: app_api on shop-dev through the session pooler, verify-full, with
+      # sslrootcert=/opt/render/project/src/certs/supabase-root-2021.crt (the certificate in this repository).
+      - key: DATABASE_URL
+        sync: false
