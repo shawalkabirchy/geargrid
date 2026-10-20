@@ -74,4 +74,6 @@ export const API_SCOPES = [
   "returns:write",
   "prices:write",
   "fitments:write",
+  "customers:write",
+  "suppliers:write",
 ] as const;

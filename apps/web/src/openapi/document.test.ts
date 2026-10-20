@@ -34,6 +34,10 @@ describe("the OpenAPI document", () => {
         "updatePrice",
         "addFitment",
         "updateFitment",
+        "addCustomer",
+        "updateCustomer",
+        "addSupplier",
+        "updateSupplier",
         "getHealth",
         "getSale",
         "getPayment",
@@ -111,6 +115,18 @@ describe("the OpenAPI document", () => {
         undo: "updateFitment",
         undo_body: { deleted: true },
         read_back: "getFitment",
+      },
+      addCustomer: {
+        dry_run: true,
+        undo: "updateCustomer",
+        undo_body: { deleted: true },
+        read_back: "getCustomer",
+      },
+      addSupplier: {
+        dry_run: true,
+        undo: "updateSupplier",
+        undo_body: { deleted: true },
+        read_back: "getSupplier",
       },
     });
     expect(document["x-host-features"]).toEqual({

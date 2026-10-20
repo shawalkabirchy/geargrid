@@ -29,6 +29,13 @@
       "when": 1791567083637,
       "tag": "0003_two_price_tiers",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1792468800000,
+      "tag": "0004_party_write_scopes",
+      "breakpoints": true
     }
   ]
 }

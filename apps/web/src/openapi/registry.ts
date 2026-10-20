@@ -658,6 +658,76 @@ registry.registerPath({
   },
 });
 
+// ---- New customers and suppliers (D173): added with a dry run, removed while nothing is recorded for them.
+
+const partyName = z.string().trim().min(1).max(100);
+const phone = z
+  .string()
+  .trim()
+  .regex(/^[0-9+\- ]{6,20}$/);
+const address = z.string().trim().min(1).max(300);
+
+export const customerInput = registry.register(
+  "CustomerInput",
+  z.object({
+    name: partyName,
+    type: z.enum(["retail", "garage"]),
+    phone: phone.optional(),
+    address: address.optional(),
+    credit_limit_taka: z.number().int().nonnegative().nullable().optional(),
+  }),
+);
+
+export const supplierInput = registry.register(
+  "SupplierInput",
+  z.object({ name: partyName, phone: phone.optional(), address: address.optional() }),
+);
+
+export const partyChange = registry.register(
+  "PartyChange",
+  z.object({
+    deleted: z.literal(true).optional(),
+    name: partyName.optional(),
+    phone: phone.optional(),
+    address: address.optional(),
+  }),
+);
+
+for (const [path, add, update, name, schema, input] of [
+  ["/api/v1/customers", "addCustomer", "updateCustomer", "customer", customerSchema, customerInput],
+  ["/api/v1/suppliers", "addSupplier", "updateSupplier", "supplier", supplierSchema, supplierInput],
+] as const) {
+  const answer = z.object({ [name]: schema, warnings: z.array(warningSchema), dry_run: z.boolean() });
+  registry.registerPath({
+    method: "post",
+    path,
+    operationId: add,
+    summary: `Add a new ${name}; ?dry_run=true checks it without saving`,
+    security,
+    request: { query: dryRunQuery, headers: idempotencyHeader, body: { content: json(input) } },
+    responses: {
+      201: { description: `The ${name} was saved`, content: json(answer) },
+      200: { description: `Dry run: the ${name} as it would be`, content: json(answer) },
+      ...errorResponses(400, 401, 403),
+    },
+    "x-supports-dry-run": true,
+    "x-compensating-operation": { operation: update, id_from: `${name}.id`, body: { deleted: true } },
+    "x-read-back": { operation: name === "customer" ? "getCustomer" : "getSupplier", id_from: `${name}.id` },
+  });
+  registry.registerPath({
+    method: "patch",
+    path: `${path}/{id}`,
+    operationId: update,
+    summary: `Edit a ${name}, or remove one with nothing recorded for it with { deleted: true }`,
+    security,
+    request: { params: idParams, body: { content: json(partyChange) } },
+    responses: {
+      200: { description: `The ${name}`, content: json(z.object({ [name]: schema })) },
+      ...errorResponses(400, 401, 403, 404, 409),
+    },
+  });
+}
+
 /** The OpenAPI 3.1 document served at /api/openapi.json. */
 export function buildOpenApiDocument() {
   const document = new OpenApiGeneratorV31(registry.definitions).generateDocument({

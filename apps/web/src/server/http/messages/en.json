@@ -11,6 +11,8 @@
     "PAYMENT_ALREADY_REVERSED": "This payment is already reversed.",
     "PURCHASE_ALREADY_REVERSED": "This purchase is already reversed.",
     "FITMENT_EXISTS": "This part is already linked to this vehicle.",
+    "CUSTOMER_IN_USE": "This customer has sales or payments, so it cannot be removed.",
+    "SUPPLIER_IN_USE": "This supplier has purchases or payments, so it cannot be removed.",
     "IDEMPOTENCY_KEY_REUSED": "This Idempotency-Key was already used with a different request.",
     "ACCOUNT_REQUIRED": "Several accounts take this payment method; name one.",
     "ACCOUNT_INVALID": "This account is inactive or of another kind.",
