@@ -8,6 +8,7 @@ import type { Answer, Context } from "../http/pipeline";
 import {
   addCheque,
   audit,
+  type AuditActor,
   changed,
   lockStock,
   lockSupplier,
@@ -100,7 +101,7 @@ export async function stockIn({
   now,
   body,
   dryRun,
-}: Context<undefined, undefined, PurchaseInput>): Promise<Answer> {
+}: Context<undefined, undefined, PurchaseInput, AuditActor>): Promise<Answer> {
   const partIds = [...new Set(body.items.map((item) => item.part_id))];
   const partRows = await tx.select().from(parts).where(inArray(parts.id, partIds));
   const partById = new Map(partRows.filter((part) => part.deletedAt === null).map((part) => [part.id, part]));
@@ -251,7 +252,7 @@ export async function reversePurchase({
   now,
   params,
   body,
-}: Context<{ id: string }, undefined, { reason: string }>): Promise<Answer> {
+}: Context<{ id: string }, undefined, { reason: string }, AuditActor>): Promise<Answer> {
   const { purchase, items, payments } = await loadPurchase(tx, params.id, true);
   if (purchase.status === "reversed") {
     throw apiError("PURCHASE_ALREADY_REVERSED", { purchase_id: purchase.id });

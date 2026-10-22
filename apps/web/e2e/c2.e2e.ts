@@ -1,6 +1,9 @@
 import { expect, test } from "@playwright/test";
 import { logIn } from "./login";
 
+// a different name on every run, so the tests can run again on the same database
+const RUN = Date.now().toString(36).toUpperCase();
+
 // C2 (DokaanBondhu spec D193): parts search and the part page, a new part with its number and fitment, vehicles,
 // shop words, and customers and suppliers with their ledgers, on the seeded shop.
 
@@ -34,30 +37,30 @@ test("searches parts by shop word and by number, and opens a part", async ({ pag
 test("adds a part, links it to a new vehicle and finds it by car model", async ({ page }) => {
   await page.goto("/vehicles");
   await page.getByLabel("কোম্পানি").fill("E2EMake");
-  await page.getByLabel("মডেল").fill("E2EModel");
+  await page.getByLabel("মডেল").fill(`E2EModel${RUN}`);
   await page.getByLabel("শুরুর সাল").fill("২০১৫");
   await page.getByRole("button", { name: "যোগ করুন" }).click();
-  await expect(page.getByRole("cell", { name: "E2EModel" })).toBeVisible();
+  await expect(page.getByRole("cell", { name: `E2EModel${RUN}` })).toBeVisible();
 
   await page.goto("/parts/new");
-  await page.getByLabel("ইংরেজি নাম").fill("E2E test bush");
-  await page.getByLabel("মূল পার্ট নম্বর").fill("E2E-BUSH-1");
+  await page.getByLabel("ইংরেজি নাম").fill(`E2E test bush ${RUN}`);
+  await page.getByLabel("মূল পার্ট নম্বর").fill(`E2E-BUSH-${RUN}`);
   await page.getByLabel("খুচরা দাম", { exact: true }).fill("১,২০০");
   await page.getByLabel("র‍্যাক").fill("Z-1");
   await page.getByRole("button", { name: "সেভ করুন" }).click();
-  await expect(page.getByRole("heading", { name: /E2E test bush/ })).toBeVisible();
+  await expect(page.getByRole("heading", { name: new RegExp(`E2E test bush ${RUN}`) })).toBeVisible();
   await expect(page.getByTestId("part-stock")).toContainText("০");
   await expect(page.getByText("১,২০০ টাকা").first()).toBeVisible();
 
   const fitments = page.getByTestId("fitments");
-  await fitments.getByLabel("গাড়ি").selectOption({ label: "E2EMake E2EModel ২০১৫–এখনো" });
+  await fitments.getByLabel("গাড়ি").selectOption({ label: `E2EMake E2EModel${RUN} ২০১৫–এখনো` });
   await fitments.getByRole("button", { name: "যোগ করুন" }).click();
-  await expect(fitments.getByText("E2EMake E2EModel")).toBeVisible();
+  await expect(fitments.getByText(`E2EMake E2EModel${RUN}`)).toBeVisible();
 
-  await page.goto("/parts?car=E2EMake%7CE2EModel&year=2020");
-  await expect(page.getByRole("link", { name: "E2E test bush" })).toBeVisible();
+  await page.goto(`/parts?car=E2EMake%7CE2EModel${RUN}&year=2020`);
+  await expect(page.getByRole("link", { name: `E2E test bush ${RUN}` })).toBeVisible();
 
-  await page.getByRole("link", { name: "E2E test bush" }).click();
+  await page.getByRole("link", { name: `E2E test bush ${RUN}` }).click();
   await page.getByRole("link", { name: "পার্ট বদলান" }).click();
   await page.getByLabel("পাইকারি (গ্যারেজ) দাম").fill("1100");
   await page.getByRole("button", { name: "সেভ করুন" }).click();

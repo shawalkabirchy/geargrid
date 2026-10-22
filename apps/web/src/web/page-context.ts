@@ -19,6 +19,8 @@ export interface PageContext {
   qty: (value: string | number) => string;
   /** Plain digits written the shop's way (years, counts). */
   digits: (text: string | number) => string;
+  /** Labels for a browser form: each key of a section, with {{placeholders}} kept for the form to fill. */
+  labels: (section: string, keys: readonly string[]) => Record<string, string>;
 }
 
 export async function pageContext(): Promise<PageContext> {
@@ -36,5 +38,19 @@ export async function pageContext(): Promise<PageContext> {
     date: (value) => digits(formatDate(value)),
     qty: (value) => digits(String(Number(value))),
     digits: (text) => digits(String(text)),
+    labels: (section, keys) =>
+      Object.fromEntries(
+        keys.map((key) => [
+          key,
+          t(`${section}.${key}`, {
+            amount: "{{amount}}",
+            qty: "{{qty}}",
+            price: "{{price}}",
+            due: "{{due}}",
+            count: "{{count}}",
+            reason: "{{reason}}",
+          }),
+        ]),
+      ),
   };
 }

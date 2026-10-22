@@ -56,14 +56,14 @@ export async function audit(
   });
 }
 
-/** The next API invoice number, A-000001 on, under the counter's row lock. */
-export async function nextInvoiceNo(tx: Tx): Promise<string> {
+/** The next invoice number, A-000001 on for the API and W-000001 on for the web dashboard, under the counter's row lock. */
+export async function nextInvoiceNo(tx: Tx, prefix: "A" | "W" = "A"): Promise<string> {
   const result = await tx.execute<{ last_sequence: string }>(
-    sql`update invoice_counters set last_sequence = last_sequence + 1 where prefix = 'A' returning last_sequence`,
+    sql`update invoice_counters set last_sequence = last_sequence + 1 where prefix = ${prefix} returning last_sequence`,
   );
   const row = result.rows[0];
-  if (!row) throw new Error("invoice counter A is missing");
-  return formatInvoiceNo("A", BigInt(row.last_sequence));
+  if (!row) throw new Error(`invoice counter ${prefix} is missing`);
+  return formatInvoiceNo(prefix, BigInt(row.last_sequence));
 }
 
 export async function lockCustomer(tx: Tx, id: string): Promise<CustomerRow> {

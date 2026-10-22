@@ -17,6 +17,7 @@ import type { Answer, Context } from "../http/pipeline";
 import {
   addCheque,
   audit,
+  type AuditActor,
   changed,
   customerEntry,
   lockCustomer,
@@ -153,7 +154,7 @@ export async function createSale({
   now,
   body,
   dryRun,
-}: Context<undefined, undefined, SaleInput>): Promise<Answer> {
+}: Context<undefined, undefined, SaleInput, AuditActor>): Promise<Answer> {
   const saleTime = body.sale_time ? new Date(body.sale_time) : now;
   const warnings: Warning[] = [];
 
@@ -168,17 +169,18 @@ export async function createSale({
 
   // Locks in the one order of spec 6.1: the invoice counter, the customer, the stock levels by part. A dry run uses no
   // invoice number.
-  const invoiceNo = dryRun ? null : await nextInvoiceNo(tx);
+  const invoiceNo = dryRun ? null : await nextInvoiceNo(tx, actor.source === "web" ? "W" : "A");
   const customer = body.customer_id ? await lockCustomer(tx, body.customer_id) : null;
   const stock = await lockStock(tx, partIds);
 
-  // Prices: the customer's tier, retail for a walk-in; another price needs prices:write.
+  // Prices: the customer's tier, retail for a walk-in; another price needs prices:write, or the owner on the web.
+  const mayChangePrice = "scopes" in actor ? actor.scopes.includes("prices:write") : actor.source === "web";
   const tier = (customer?.priceTier ?? "retail") as PriceTier;
   const lines = body.items.map((item) => {
     const part = partById.get(item.part_id)!;
     const listPrice = tierPrice(part, tier);
     const unitPrice = item.unit_price_taka === undefined ? listPrice : BigInt(item.unit_price_taka);
-    if (unitPrice !== listPrice && !actor.scopes.includes("prices:write")) {
+    if (unitPrice !== listPrice && !mayChangePrice) {
       throw apiError("CUSTOM_PRICE_FORBIDDEN", { part_id: part.id, tier_price_taka: taka(listPrice) });
     }
     return { part, quantityMilli: milli(item.quantity), unitPrice, listPrice };
@@ -220,7 +222,7 @@ export async function createSale({
     .values({
       id: saleId,
       invoiceNo: invoiceNo ?? `A-DRYRUN-${saleId}`, // rolled back; the answer says null
-      apiKeyId: actor.apiKeyId,
+      apiKeyId: "apiKeyId" in actor ? actor.apiKeyId : null,
       customerId: customer?.id ?? null,
       saleTime,
       subtotal: totals.subtotal,
@@ -337,7 +339,7 @@ export async function voidSale({
   now,
   params,
   body,
-}: Context<{ id: string }, undefined, { reason: string }>): Promise<Answer> {
+}: Context<{ id: string }, undefined, { reason: string }, AuditActor>): Promise<Answer> {
   const { sale, items, payments } = await loadSale(tx, params.id, true);
   if (sale.status === "void") throw apiError("SALE_ALREADY_VOID", { sale_id: sale.id });
   const [returned] = await tx

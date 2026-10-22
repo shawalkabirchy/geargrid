@@ -7,6 +7,7 @@ import { iso, quantityNumber, taka } from "../http/json";
 import type { Answer, Context } from "../http/pipeline";
 import {
   audit,
+  type AuditActor,
   changed,
   customerEntry,
   lockCustomer,
@@ -76,7 +77,7 @@ export async function recordReturn({
   now,
   body,
   dryRun,
-}: Context<undefined, undefined, ReturnInput>): Promise<Answer> {
+}: Context<undefined, undefined, ReturnInput, AuditActor>): Promise<Answer> {
   // The sale is locked, so two returns of one sale are counted one after the other.
   const [sale] = await tx
     .select()

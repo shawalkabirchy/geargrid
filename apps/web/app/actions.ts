@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 import { database } from "../src/server/db";
 import { setLanguage, settingsInput, updateSettings } from "../src/server/services/settings";
 import { requireUser, signIn, signOut, webActor } from "../src/web/auth";
-import { allowTry } from "../src/web/rate-limit";
+import { failedTry, goodTry, mayTry } from "../src/web/rate-limit";
 
 // The web dashboard's form actions. Each one checks the login itself: an action is a public endpoint.
 
@@ -21,9 +21,13 @@ export async function loginAction(_previous: FormState, form: FormData): Promise
   const email = String(form.get("email") ?? "").trim();
   const password = String(form.get("password") ?? "");
   const address = (await headers()).get("x-forwarded-for")?.split(",")[0]?.trim() || "local";
-  if (!allowTry(`${address}|${email.toLowerCase()}`)) return { status: "error", message: "login.too_many" };
-  if (!email || !password || !(await signIn(email, password)))
+  const key = `${address}|${email.toLowerCase()}`;
+  if (!mayTry(key)) return { status: "error", message: "login.too_many" };
+  if (!email || !password || !(await signIn(email, password))) {
+    failedTry(key);
     return { status: "error", message: "login.failed" };
+  }
+  goodTry(key);
   redirect("/");
 }
 

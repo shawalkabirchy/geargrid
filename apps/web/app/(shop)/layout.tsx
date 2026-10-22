@@ -11,7 +11,7 @@ export default async function ShopLayout({ children }: { children: ReactNode }) 
   const { t, settings, language } = await pageContext();
   return (
     <div lang={language} className="min-h-screen">
-      <header className="bg-brand text-white">
+      <header className="bg-brand text-white print:hidden">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3">
           <Link href="/" className="text-xl font-bold">
             {settings.shopName}
@@ -19,6 +19,18 @@ export default async function ShopLayout({ children }: { children: ReactNode }) 
           <nav className="flex flex-wrap gap-x-4 gap-y-1 text-lg">
             <Link href="/" className="hover:underline">
               {t("nav.home")}
+            </Link>
+            <Link
+              href="/sales/new"
+              className="rounded-lg bg-white px-2 font-semibold text-brand-ink hover:bg-brand-soft"
+            >
+              {t("nav.new_sale")}
+            </Link>
+            <Link href="/sales" className="hover:underline">
+              {t("nav.sales")}
+            </Link>
+            <Link href="/purchases" className="hover:underline">
+              {t("nav.purchases")}
             </Link>
             <Link href="/parts" className="hover:underline">
               {t("nav.parts")}

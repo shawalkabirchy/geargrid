@@ -8,6 +8,7 @@ import type { Answer, Context } from "../http/pipeline";
 import {
   addCheque,
   audit,
+  type AuditActor,
   changed,
   customerEntry,
   lockCustomer,
@@ -61,7 +62,7 @@ export async function receivePayment({
   now,
   body,
   dryRun,
-}: Context<undefined, undefined, PaymentBody>): Promise<Answer> {
+}: Context<undefined, undefined, PaymentBody, AuditActor>): Promise<Answer> {
   const customer = await lockCustomer(tx, body.customer_id);
   const amount = BigInt(body.amount_taka);
   if (amount > customer.dueBalance) {
@@ -128,7 +129,7 @@ export async function reversePayment({
   now,
   params,
   body,
-}: Context<{ id: string }, undefined, { reason: string }>): Promise<Answer> {
+}: Context<{ id: string }, undefined, { reason: string }, AuditActor>): Promise<Answer> {
   const payment = await loadPayment(tx, params.id, true);
   if (payment.status === "reversed") throw apiError("PAYMENT_ALREADY_REVERSED", { payment_id: payment.id });
   const before = paymentView(payment);

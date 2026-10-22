@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { database } from "../../src/server/db";
 import { todaySummary } from "../../src/server/services/home";
 import { pageContext } from "../../src/web/page-context";
@@ -22,9 +23,14 @@ export default async function HomePage() {
   ];
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">
-        {t("home.title")} <span className="font-normal text-stone-500">{date(today.date)}</span>
-      </h1>
+      <div className="flex flex-wrap items-center gap-4">
+        <h1 className="text-2xl font-bold">
+          {t("home.title")} <span className="font-normal text-stone-500">{date(today.date)}</span>
+        </h1>
+        <Link href="/sales/new" className="button-primary ml-auto inline-flex items-center text-xl">
+          {t("nav.new_sale")}
+        </Link>
+      </div>
       <section className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
         {tiles.map((tile) => (
           <div key={tile.key} className="card" data-testid={`tile-${tile.key}`}>
