@@ -303,6 +303,7 @@
       "part.create": "New part",
       "part.update": "Part changed",
       "part.price_update": "Price changed",
+      "part.rack_update": "Rack changed",
       "part_number.create": "Part number added",
       "part_number.delete": "Part number removed",
       "alias.create": "Shop word added",

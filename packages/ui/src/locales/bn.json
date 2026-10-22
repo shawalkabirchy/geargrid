@@ -303,6 +303,7 @@
       "part.create": "নতুন পার্ট",
       "part.update": "পার্ট বদল",
       "part.price_update": "দাম বদল",
+      "part.rack_update": "র‍্যাক বদল",
       "part_number.create": "পার্ট নম্বর যোগ",
       "part_number.delete": "পার্ট নম্বর মোছা",
       "alias.create": "দোকানের শব্দ যোগ",

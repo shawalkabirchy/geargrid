@@ -73,6 +73,7 @@ export const API_SCOPES = [
   "purchases:write",
   "returns:write",
   "prices:write",
+  "racks:write",
   "fitments:write",
   "customers:write",
   "suppliers:write",

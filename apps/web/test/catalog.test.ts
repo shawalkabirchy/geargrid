@@ -1,11 +1,13 @@
+import { readFileSync } from "node:fs";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { POST as addFitment } from "../app/api/v1/fitments/route";
 import { GET as getFitment, PATCH as updateFitment } from "../app/api/v1/fitments/[id]/route";
 import { PATCH as updatePrice } from "../app/api/v1/parts/[id]/price/route";
+import { PATCH as updateRack } from "../app/api/v1/parts/[id]/rack/route";
 import { call, createTestShop, failedChecks, first, inCi, NO_READ_KEY, type TestShop } from "./harness";
 
-// Price changes and fitment links (spec 6.5, 6.10): the previous prices come back for an undo, a link cannot be added
-// twice, and { deleted: true } removes it.
+// Price and rack changes and fitment links (spec 6.5, 6.10): the previous prices and rack come back for an undo, a link
+// cannot be added twice, and { deleted: true } removes it.
 
 describe.skipIf(!inCi)("prices and fitments", () => {
   let shop: TestShop;
@@ -87,6 +89,108 @@ describe.skipIf(!inCi)("prices and fitments", () => {
         }),
       ),
     ).toBe("NOT_FOUND");
+  });
+
+  // DokaanBondhu D195: a rack set by voice or chat, and undone with the previous one.
+  it("changes a rack, keeps the previous one, and the previous one puts it back", async () => {
+    const { rack_location: before } = await first<{ rack_location: string | null }>(
+      shop,
+      "select rack_location from parts where id = $1",
+      [part.id],
+    );
+    const moved = await call(updateRack, {
+      method: "PATCH",
+      params: { id: part.id },
+      body: { rack_location: " Z-9 " },
+    });
+    expect(moved.status).toBe(200);
+    expect(moved.body).toEqual({
+      part: { id: part.id, rack_location: "Z-9" },
+      previous: { rack_location: before },
+    });
+    expect(
+      await first(
+        shop,
+        "select action from audit_logs where entity_id = $1 order by created_at desc limit 1",
+        [part.id],
+      ),
+    ).toEqual({ action: "part.rack_update" });
+    const cleared = await call(updateRack, {
+      method: "PATCH",
+      params: { id: part.id },
+      body: { rack_location: null },
+    });
+    expect(cleared.body).toEqual({
+      part: { id: part.id, rack_location: null },
+      previous: { rack_location: "Z-9" },
+    });
+    const undone = await call(updateRack, {
+      method: "PATCH",
+      params: { id: part.id },
+      body: { rack_location: before },
+    });
+    expect(undone.status).toBe(200);
+    expect(await first(shop, "select rack_location from parts where id = $1", [part.id])).toEqual({
+      rack_location: before,
+    });
+    expect(await failedChecks(shop)).toEqual([]);
+  });
+
+  it("refuses a rack change without racks:write, with an empty or too long rack, or for an unknown part", async () => {
+    const forbidden = await call(updateRack, {
+      method: "PATCH",
+      params: { id: part.id },
+      body: { rack_location: "A-1" },
+      key: NO_READ_KEY,
+    });
+    expect(forbidden.status).toBe(403);
+    expect(forbidden.body.error).toMatchObject({
+      code: "FORBIDDEN_SCOPE",
+      details: { required: "racks:write" },
+    });
+    for (const body of [{}, { rack_location: "  " }, { rack_location: "R".repeat(21) }])
+      expect(errorCode(await call(updateRack, { method: "PATCH", params: { id: part.id }, body }))).toBe(
+        "VALIDATION_FAILED",
+      );
+    expect(
+      errorCode(
+        await call(updateRack, {
+          method: "PATCH",
+          params: { id: "0192e011-2a4c-7f3e-b5d1-9c8a7e6f5d40" },
+          body: { rack_location: "A-1" },
+        }),
+      ),
+    ).toBe("NOT_FOUND");
+  });
+
+  it("migration 0005 gives racks:write to a key with every earlier scope, and to no other", async () => {
+    const earlier = [
+      "read",
+      "sales:write",
+      "payments:write",
+      "purchases:write",
+      "returns:write",
+      "prices:write",
+      "fitments:write",
+      "customers:write",
+      "suppliers:write",
+    ];
+    await shop.admin.query(
+      `insert into api_keys (id, name, key_prefix, key_hash, scopes) values
+        ('0192e011-2a4c-7f3e-b5d1-9c8a7e6f5d41', 'assistant before 0005', 'ggk_old0', 'hash-old0', $1),
+        ('0192e011-2a4c-7f3e-b5d1-9c8a7e6f5d42', 'reader', 'ggk_old1', 'hash-old1', '{read}')`,
+      [earlier],
+    );
+    await shop.admin.query(
+      readFileSync(
+        new URL("../../../supabase/migrations/0005_rack_write_scope.sql", import.meta.url),
+        "utf8",
+      ),
+    );
+    const scopes = async (name: string) =>
+      (await first<{ scopes: string[] }>(shop, "select scopes from api_keys where name = $1", [name])).scopes;
+    expect(await scopes("assistant before 0005")).toEqual([...earlier, "racks:write"]);
+    expect(await scopes("reader")).toEqual(["read"]);
   });
 
   it("adds a link once, removes it with deleted: true, and allows it again after", async () => {

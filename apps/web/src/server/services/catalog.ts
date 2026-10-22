@@ -7,8 +7,8 @@ import type { Answer, Context } from "../http/pipeline";
 import { audit, changed, type AuditActor } from "../posting";
 import { fitmentView } from "./reads";
 
-// Price changes and fitment links (spec 6.5): PATCH /parts/{id}/price, POST /fitments, PATCH /fitments/{id}. Only the
-// row itself changes, plus the audit and change-log rows (spec 6.6).
+// Price and rack changes and fitment links (spec 6.5): PATCH /parts/{id}/price, PATCH /parts/{id}/rack, POST /fitments,
+// PATCH /fitments/{id}. Only the row itself changes, plus the audit and change-log rows (spec 6.6).
 
 export interface PriceInput {
   retail_price_taka?: number | undefined;
@@ -51,6 +51,35 @@ export async function updatePrice({
   const now_ = prices(updated!);
   await audit(tx, actor, "part.price_update", "part", part.id, previous, now_);
   return { status: 200, body: { part: { id: part.id, ...now_ }, previous } };
+}
+
+export interface RackInput {
+  rack_location: string | null;
+}
+
+/** A part's rack (DokaanBondhu D195); `previous` is what an undo sends back, like a price change's. */
+export async function updateRack({
+  tx,
+  actor,
+  now,
+  params,
+  body,
+}: Context<{ id: string }, undefined, RackInput, AuditActor>): Promise<Answer> {
+  const [part] = await tx
+    .select({ id: parts.id, rackLocation: parts.rackLocation })
+    .from(parts)
+    .where(and(eq(parts.id, params.id), isNull(parts.deletedAt)))
+    .for("update");
+  if (!part) throw apiError("NOT_FOUND", { entity: "part", id: params.id });
+  const previous = { rack_location: part.rackLocation };
+  await tx
+    .update(parts)
+    .set({ rackLocation: body.rack_location, updatedAt: now, version: sql`${parts.version} + 1` })
+    .where(eq(parts.id, part.id));
+  await changed(tx, "parts", part.id);
+  const rack = { rack_location: body.rack_location };
+  await audit(tx, actor, "part.rack_update", "part", part.id, previous, rack);
+  return { status: 200, body: { part: { id: part.id, ...rack }, previous } };
 }
 
 export interface FitmentInput {

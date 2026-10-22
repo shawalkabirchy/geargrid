@@ -611,6 +611,35 @@ registry.registerPath({
   "x-read-back": { operation: "getPart", id_from: "part.id" },
 });
 
+export const rackInput = registry.register(
+  "RackInput",
+  z.object({ rack_location: z.string().trim().min(1).max(20).nullable() }),
+);
+
+const rack = z.object({ rack_location: z.string().nullable() });
+
+registry.registerPath({
+  method: "patch",
+  path: "/api/v1/parts/{id}/rack",
+  operationId: "updateRack",
+  summary: "Change the rack a part is kept on, or clear it; the answer keeps the previous rack for an undo",
+  security,
+  request: { params: idParams, body: { content: json(rackInput) } },
+  responses: {
+    200: {
+      description: "The new rack and the previous one",
+      content: json(z.object({ part: rack.extend({ id: z.uuid() }), previous: rack })),
+    },
+    ...errorResponses(400, 401, 403, 404),
+  },
+  "x-compensating-operation": {
+    operation: "updateRack",
+    id_from: "part.id",
+    body: { rack_location: "{previous.rack_location}" },
+  },
+  "x-read-back": { operation: "getPart", id_from: "part.id" },
+});
+
 export const fitmentInput = registry.register(
   "FitmentInput",
   z.object({
