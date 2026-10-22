@@ -32,6 +32,7 @@ describe("the OpenAPI document", () => {
         "reversePurchase",
         "recordReturn",
         "updatePrice",
+        "updateRack",
         "addFitment",
         "updateFitment",
         "addCustomer",
@@ -108,6 +109,12 @@ describe("the OpenAPI document", () => {
           retail_price_taka: "{previous.retail_price_taka}",
           garage_price_taka: "{previous.garage_price_taka}",
         },
+        read_back: "getPart",
+      },
+      updateRack: {
+        dry_run: false,
+        undo: "updateRack",
+        undo_body: { rack_location: "{previous.rack_location}" },
         read_back: "getPart",
       },
       addFitment: {
