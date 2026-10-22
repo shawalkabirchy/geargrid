@@ -31,17 +31,21 @@ export async function changed(tx: Tx, entity: string, ...ids: string[]): Promise
   await tx.insert(changeLog).values(ids.map((entityId) => ({ entity, entityId, op: "upsert" })));
 }
 
+/** Who made a change: an API key (with X-Acting-User), or a person logged in on the web (slice C). */
+export type AuditActor = Actor | { source: "web"; userId: string; actingUser: string | null };
+
 export async function audit(
   tx: Tx,
-  actor: Actor,
+  actor: AuditActor,
   action: string,
   entity: string,
-  entityId: string,
+  entityId: string | null,
   before: unknown,
   after: unknown,
 ): Promise<void> {
   await tx.insert(auditLogs).values({
-    apiKeyId: actor.apiKeyId,
+    apiKeyId: "apiKeyId" in actor ? actor.apiKeyId : null,
+    userId: "userId" in actor ? actor.userId : null,
     source: actor.source,
     actingUser: actor.actingUser,
     action,

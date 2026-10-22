@@ -21,7 +21,8 @@
     "db:roles": "node --env-file-if-exists=.env.local --import tsx scripts/db-roles.ts",
     "db:seed": "node --env-file-if-exists=.env.local --import tsx supabase/seed/seed.ts",
     "db:check": "node --env-file-if-exists=.env.local --import tsx scripts/db-check.ts",
-    "db:reset-demo": "node --env-file-if-exists=.env.local --import tsx scripts/db-reset-demo.ts"
+    "db:reset-demo": "node --env-file-if-exists=.env.local --import tsx scripts/db-reset-demo.ts",
+    "auth:owner": "node --env-file-if-exists=.env.local --import tsx scripts/auth-owner.ts"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
@@ -37,6 +38,7 @@
     "vitest": "5.0.1"
   },
   "dependencies": {
+    "@supabase/supabase-js": "2.117.3",
     "drizzle-orm": "0.45.2",
     "pg": "8.23.0",
     "tsx": "4.23.15",

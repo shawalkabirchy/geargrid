@@ -7,7 +7,8 @@
     "APP_API_PASSWORD",
     "DOKAAN_RO_PASSWORD",
     "SEED_API_KEY",
-    "GEARGRID_ENV"
+    "GEARGRID_ENV",
+    "WEB_TEST_PASSWORD"
   ],
   "tasks": {
     "typecheck": {},

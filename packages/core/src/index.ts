@@ -1,4 +1,5 @@
 export { AppError } from "./errors";
+export { addDays, dhakaDate, dhakaDay, formatDate } from "./dates";
 export { formatTaka } from "./format";
 export { formatInvoiceNo, isInvoiceNo, type InvoiceSource } from "./invoice";
 export {

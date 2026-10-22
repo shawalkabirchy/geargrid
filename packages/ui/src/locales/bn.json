@@ -1,0 +1,65 @@
+{
+  "app": { "name": "গিয়ারগ্রিড" },
+  "common": {
+    "taka": "{{amount}} টাকা",
+    "save": "সেভ করুন",
+    "saving": "সেভ হচ্ছে…"
+  },
+  "nav": {
+    "home": "হোম",
+    "settings": "সেটিংস",
+    "logout": "লগ আউট",
+    "language": "English"
+  },
+  "login": {
+    "title": "লগ ইন",
+    "email": "ইমেইল",
+    "password": "পাসওয়ার্ড",
+    "submit": "লগ ইন করুন",
+    "failed": "ইমেইল বা পাসওয়ার্ড ঠিক নেই।",
+    "too_many": "অনেকবার চেষ্টা হয়েছে। ১৫ মিনিট পরে আবার চেষ্টা করুন।",
+    "not_set_up": "লগ ইন এখনো চালু হয়নি। সার্ভারে Supabase-এর ঠিকানা আর চাবি দিতে হবে।"
+  },
+  "home": {
+    "title": "আজকের হিসাব",
+    "sales": "আজকের বিক্রি",
+    "sales_count_one": "{{count}}টি বিল",
+    "sales_count_other": "{{count}}টি বিল",
+    "profit": "লাভ",
+    "cash_in_hand": "হাতে নগদ",
+    "dues_collected": "বাকি আদায়",
+    "expenses": "খরচ",
+    "accounts": "হিসাবের ব্যালান্স",
+    "cheques_due": "সাত দিনের মধ্যে চেক",
+    "no_cheques": "সাত দিনের মধ্যে কোনো চেক নেই।",
+    "cheque_received": "পাওয়া চেক",
+    "cheque_issued": "দেওয়া চেক",
+    "overdue": "তারিখ পার হয়েছে"
+  },
+  "account_kind": {
+    "cash": "নগদ",
+    "bkash": "বিকাশ",
+    "nagad": "নগদ (মোবাইল)",
+    "rocket": "রকেট",
+    "bank": "ব্যাংক"
+  },
+  "settings": {
+    "title": "সেটিংস",
+    "shop": "দোকানের তথ্য",
+    "shop_name": "দোকানের নাম",
+    "market_area": "মার্কেট / এলাকা",
+    "phone": "ফোন",
+    "address": "ঠিকানা",
+    "display": "দেখানো",
+    "language": "ভাষা",
+    "language_bn": "বাংলা",
+    "language_en": "English",
+    "bangla_digits": "বাংলা অঙ্কে টাকা দেখান (১,২৫,৫০০)",
+    "round_off": "বিলের টাকা রাউন্ড করুন",
+    "round_off_1": "১ টাকা (রাউন্ড নয়)",
+    "round_off_5": "৫ টাকায়",
+    "round_off_10": "১০ টাকায়",
+    "saved": "সেভ হয়েছে।",
+    "invalid": "কিছু ঘর ঠিক নেই: {{fields}}"
+  }
+}

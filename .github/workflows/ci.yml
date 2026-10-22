@@ -37,3 +37,12 @@ jobs:
       - run: npm run db:seed
       - run: npm run db:check
       - run: npm run test # unit and database tests
+      # The web dashboard's page tests (DokaanBondhu spec D193): a built app on the seeded database, test login only
+      - run: npx playwright install --with-deps chromium
+        working-directory: apps/web
+      - run: npx next build
+        working-directory: apps/web
+      - run: npm run test:e2e
+        working-directory: apps/web
+        env:
+          WEB_TEST_PASSWORD: ci-web-test-password-0001

@@ -1,0 +1,65 @@
+{
+  "app": { "name": "GearGrid" },
+  "common": {
+    "taka": "{{amount}} taka",
+    "save": "Save",
+    "saving": "Saving…"
+  },
+  "nav": {
+    "home": "Home",
+    "settings": "Settings",
+    "logout": "Log out",
+    "language": "বাংলা"
+  },
+  "login": {
+    "title": "Log in",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Log in",
+    "failed": "The email or password is not right.",
+    "too_many": "Too many tries. Try again in 15 minutes.",
+    "not_set_up": "Login is not set up yet. The server needs the Supabase address and key."
+  },
+  "home": {
+    "title": "Today",
+    "sales": "Today's sales",
+    "sales_count_one": "{{count}} bill",
+    "sales_count_other": "{{count}} bills",
+    "profit": "Profit",
+    "cash_in_hand": "Cash in hand",
+    "dues_collected": "Dues collected",
+    "expenses": "Expenses",
+    "accounts": "Account balances",
+    "cheques_due": "Cheques due in seven days",
+    "no_cheques": "No cheques due in the next seven days.",
+    "cheque_received": "Received",
+    "cheque_issued": "Issued",
+    "overdue": "Overdue"
+  },
+  "account_kind": {
+    "cash": "Cash",
+    "bkash": "bKash",
+    "nagad": "Nagad",
+    "rocket": "Rocket",
+    "bank": "Bank"
+  },
+  "settings": {
+    "title": "Settings",
+    "shop": "Shop profile",
+    "shop_name": "Shop name",
+    "market_area": "Market / area",
+    "phone": "Phone",
+    "address": "Address",
+    "display": "Display",
+    "language": "Language",
+    "language_bn": "বাংলা",
+    "language_en": "English",
+    "bangla_digits": "Show taka in Bangla digits (১,২৫,৫০০)",
+    "round_off": "Round bills to",
+    "round_off_1": "1 taka (no rounding)",
+    "round_off_5": "5 taka",
+    "round_off_10": "10 taka",
+    "saved": "Saved.",
+    "invalid": "Some fields are not right: {{fields}}"
+  }
+}

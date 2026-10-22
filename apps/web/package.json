@@ -8,12 +8,16 @@
     "build": "next build",
     "start": "next start -p 3200",
     "typecheck": "next typegen && tsc --noEmit -p tsconfig.json",
-    "test": "vitest run --passWithNoTests --testTimeout=120000 --no-file-parallelism"
+    "test": "vitest run --passWithNoTests --testTimeout=120000 --no-file-parallelism",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@asteasolutions/zod-to-openapi": "9.1.0",
     "@geargrid/core": "*",
     "@geargrid/db": "*",
+    "@geargrid/ui": "*",
+    "@supabase/ssr": "0.12.7",
+    "@supabase/supabase-js": "2.117.3",
     "drizzle-orm": "0.45.2",
     "next": "16.4.0",
     "pg": "8.23.0",
@@ -22,7 +26,10 @@
     "zod": "4.6.5"
   },
   "devDependencies": {
+    "@playwright/test": "1.64.0",
+    "@tailwindcss/postcss": "4.3.3",
     "@types/react": "19.2.18",
-    "@types/react-dom": "19.2.7"
+    "@types/react-dom": "19.2.7",
+    "tailwindcss": "4.3.3"
   }
 }
