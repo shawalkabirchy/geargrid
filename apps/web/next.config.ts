@@ -12,6 +12,8 @@ const config: NextConfig = {
   transpilePackages: ["@geargrid/core", "@geargrid/db"],
   turbopack: { root },
   outputFileTracingRoot: root,
+  // the web dashboard's Excel import uploads files of up to 5 MB through a form (DokaanBondhu spec D193)
+  experimental: { serverActions: { bodySizeLimit: "6mb" } },
 };
 
 export default config;

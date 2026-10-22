@@ -14,7 +14,7 @@ import {
   removeNumberAction,
 } from "../../catalog-actions";
 import { adjustStockAction } from "../../money-actions";
-import { cell, Check, Field, money, PageHead, small, Table } from "../../ui";
+import { cell, Check, Field, money, PageHead, small, SmallLink, Table } from "../../ui";
 
 // One part (GearGrid plan 8.1, "Part details"): its record and prices, numbers, shop words, the vehicles it fits and
 // its stock history, with the owner's changes in place.
@@ -72,6 +72,7 @@ export default async function PartPage({ params }: { params: Promise<{ id: strin
         <Link href={`/parts/${part.id}/edit`} className="button-primary inline-flex items-center">
           {t("part.edit")}
         </Link>
+        <SmallLink href={`/audit?entity=part&id=${part.id}`}>{t("audit.history")}</SmallLink>
       </PageHead>
 
       <div className="grid gap-6 lg:grid-cols-2">

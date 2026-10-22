@@ -4,7 +4,21 @@ import { requireUser } from "../../src/web/auth";
 import { pageContext } from "../../src/web/page-context";
 import { languageAction, logoutAction } from "../actions";
 
-// The page frame of every logged-in page: shop name, menu, language switch, logout.
+// The page frame of every logged-in page: shop name, the menu in two rows (the daily work, then the rest), the
+// language switch and logout.
+
+const MAIN = ["sales", "purchases", "parts", "customers", "suppliers", "money", "reports"] as const;
+const MORE = [
+  "stock",
+  "expenses",
+  "cheques",
+  "review",
+  "vehicles",
+  "aliases",
+  "import",
+  "audit",
+  "settings",
+] as const;
 
 export default async function ShopLayout({ children }: { children: ReactNode }) {
   const user = await requireUser();
@@ -12,11 +26,11 @@ export default async function ShopLayout({ children }: { children: ReactNode }) 
   return (
     <div lang={language} className="min-h-screen">
       <header className="bg-brand text-white print:hidden">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 gap-y-2 px-4 pt-3">
           <Link href="/" className="text-xl font-bold">
             {settings.shopName}
           </Link>
-          <nav className="flex flex-wrap gap-x-4 gap-y-1 text-lg">
+          <nav className="flex flex-wrap items-center gap-x-4 gap-y-1 text-lg">
             <Link href="/" className="hover:underline">
               {t("nav.home")}
             </Link>
@@ -26,45 +40,11 @@ export default async function ShopLayout({ children }: { children: ReactNode }) 
             >
               {t("nav.new_sale")}
             </Link>
-            <Link href="/sales" className="hover:underline">
-              {t("nav.sales")}
-            </Link>
-            <Link href="/purchases" className="hover:underline">
-              {t("nav.purchases")}
-            </Link>
-            <Link href="/parts" className="hover:underline">
-              {t("nav.parts")}
-            </Link>
-            <Link href="/customers" className="hover:underline">
-              {t("nav.customers")}
-            </Link>
-            <Link href="/suppliers" className="hover:underline">
-              {t("nav.suppliers")}
-            </Link>
-            <Link href="/vehicles" className="hover:underline">
-              {t("nav.vehicles")}
-            </Link>
-            <Link href="/aliases" className="hover:underline">
-              {t("nav.aliases")}
-            </Link>
-            <Link href="/money" className="hover:underline">
-              {t("nav.money")}
-            </Link>
-            <Link href="/expenses" className="hover:underline">
-              {t("nav.expenses")}
-            </Link>
-            <Link href="/cheques" className="hover:underline">
-              {t("nav.cheques")}
-            </Link>
-            <Link href="/stock" className="hover:underline">
-              {t("nav.stock")}
-            </Link>
-            <Link href="/review" className="hover:underline">
-              {t("nav.review")}
-            </Link>
-            <Link href="/settings" className="hover:underline">
-              {t("nav.settings")}
-            </Link>
+            {MAIN.map((key) => (
+              <Link key={key} href={`/${key}`} className="hover:underline">
+                {t(`nav.${key}`)}
+              </Link>
+            ))}
           </nav>
           <div className="ml-auto flex items-center gap-3">
             <span className="text-brand-soft">{user.name}</span>
@@ -84,6 +64,13 @@ export default async function ShopLayout({ children }: { children: ReactNode }) 
             </form>
           </div>
         </div>
+        <nav className="mx-auto flex max-w-6xl flex-wrap gap-x-4 gap-y-1 px-4 pt-1 pb-2 text-base text-brand-soft">
+          {MORE.map((key) => (
+            <Link key={key} href={`/${key}`} className="hover:text-white hover:underline">
+              {t(`nav.${key}`)}
+            </Link>
+          ))}
+        </nav>
       </header>
       <main className="mx-auto max-w-6xl px-4 py-6">{children}</main>
     </div>

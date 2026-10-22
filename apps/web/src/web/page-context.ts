@@ -26,7 +26,7 @@ export interface PageContext {
 export async function pageContext(): Promise<PageContext> {
   const settings = await getSettings(database());
   const language: Language = settings.language === "en" ? "en" : "bn";
-  const t = translator(language);
+  const t = translator(language, { banglaDigits: settings.banglaDigits });
   const digits = (text: string) =>
     settings.banglaDigits ? text.replace(/\d/g, (d) => BANGLA_DIGITS[Number(d)] ?? d) : text;
   return {

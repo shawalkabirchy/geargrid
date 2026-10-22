@@ -8,7 +8,7 @@ import { LedgerTable } from "../../ledger-table";
 import { editSupplierAction, removeSupplierAction } from "../../party-actions";
 import { METHOD_KEYS } from "../../form-labels";
 import { paySupplierAction } from "../../money-actions";
-import { Field, PageHead } from "../../ui";
+import { Field, PageHead, SmallLink } from "../../ui";
 
 // One supplier (GearGrid plan 2.7, 8.1): what the shop owes, the details and the ledger. A supplier with nothing in
 // the ledger can be removed (D173).
@@ -24,7 +24,12 @@ export default async function SupplierPage({ params }: { params: Promise<{ id: s
   const f = (name: string) => t(`fields.${name}`);
   return (
     <div className="space-y-6">
-      <PageHead title={supplier.name} />
+      <PageHead title={supplier.name}>
+        <SmallLink href={`/reports/supplier_statement?party=${supplier.id}`}>
+          {t("reports.statement")}
+        </SmallLink>
+        <SmallLink href={`/audit?entity=supplier&id=${supplier.id}`}>{t("audit.history")}</SmallLink>
+      </PageHead>
       <section className="card text-lg">
         {t("suppliers.payable")}:{" "}
         <strong data-testid="supplier-payable">{taka(BigInt(supplier.payable_balance))}</strong>

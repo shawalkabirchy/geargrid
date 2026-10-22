@@ -9,7 +9,7 @@ import { pageContext } from "../../../../src/web/page-context";
 import { ActionForm } from "../../action-form";
 import { voidSaleAction } from "../../trade-actions";
 import { cell, Field, money, Table } from "../../ui";
-import { PrintButton } from "./print-button";
+import { PrintButton } from "../../print-button";
 
 // One sale as its bill (GearGrid plan 8.1, appendix "Sample WhatsApp bill"): the shop, the lines, the totals and how it
 // was paid; Print, a WhatsApp link with the bill as text, the return and the void (spec 6.5 rules).
@@ -59,6 +59,12 @@ export default async function SalePage({ params }: { params: Promise<{ id: strin
     <div className="space-y-6">
       <div className="flex flex-wrap gap-2 print:hidden">
         <PrintButton label={t("sale.print")} />
+        <Link
+          href={`/audit?entity=sale&id=${sale.id}`}
+          className="inline-flex min-h-12 items-center rounded-lg border border-stone-300 px-3 hover:bg-stone-100"
+        >
+          {t("audit.history")}
+        </Link>
         <a
           href={whatsapp}
           target="_blank"

@@ -17,3 +17,11 @@ describe("labels", () => {
     expect(translator("en")("home.sales_count", { count: 3 })).toBe("3 bills");
   });
 });
+
+describe("counts in labels", () => {
+  it("are written in Bangla digits when the shop uses them", () => {
+    expect(translator("bn", { banglaDigits: true })("home.sales_count", { count: 57 })).toBe("৫৭টি বিল");
+    expect(translator("bn", { banglaDigits: false })("home.sales_count", { count: 57 })).toBe("57টি বিল");
+    expect(translator("en", { banglaDigits: true })("home.sales_count", { count: 1 })).toBe("১ bill");
+  });
+});

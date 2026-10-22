@@ -67,7 +67,7 @@ describe.skipIf(!inCi)("home and settings", () => {
     }
     const due = await first<{ count: string }>(
       shop,
-      `select count(*) from cheques where status = 'pending' and deleted_at is null
+      `select count(*) from cheques where status in ('pending', 'deposited') and deleted_at is null
        and due_date <= (now() at time zone 'Asia/Dhaka')::date + 7`,
     );
     expect(summary.chequesDue).toHaveLength(Number(due.count));

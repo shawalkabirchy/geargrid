@@ -8,7 +8,7 @@ import { LedgerTable } from "../../ledger-table";
 import { editCustomerAction, removeCustomerAction } from "../../party-actions";
 import { METHOD_KEYS } from "../../form-labels";
 import { receivePaymentAction, reversePaymentAction } from "../../trade-actions";
-import { cell, Field, money, PageHead, small, Table } from "../../ui";
+import { cell, Field, money, PageHead, small, SmallLink, Table } from "../../ui";
 
 // One customer (GearGrid plan 2.5, 8.1): what they owe, their details and price tier, and the ledger. A customer with
 // nothing in the ledger can be removed (D173).
@@ -34,7 +34,12 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
             </span>
           </>
         }
-      />
+      >
+        <SmallLink href={`/reports/customer_statement?party=${customer.id}`}>
+          {t("reports.statement")}
+        </SmallLink>
+        <SmallLink href={`/audit?entity=customer&id=${customer.id}`}>{t("audit.history")}</SmallLink>
+      </PageHead>
       <section className="card flex flex-wrap gap-x-10 gap-y-2 text-lg">
         <div>
           {t("customers.due")}:{" "}

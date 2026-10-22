@@ -5,7 +5,7 @@ import { allAccounts, cashBook, closings } from "../../../../src/server/services
 import { pageContext } from "../../../../src/web/page-context";
 import { ActionForm } from "../../action-form";
 import { closeDayAction, editAccountAction } from "../../money-actions";
-import { cell, Check, Field, money, PageHead, Table } from "../../ui";
+import { cell, Check, Field, money, PageHead, SmallLink, Table } from "../../ui";
 
 // One account's cash book (GearGrid plan 2.8): the opening balance, every movement in and out, the closing balance
 // for a range of days (today by default); the daily closing, where the owner enters the counted money; and the
@@ -39,7 +39,11 @@ export default async function CashBookPage({
 
   return (
     <div className="space-y-6">
-      <PageHead title={`${t("money.cash_book")}: ${account.name}`} />
+      <PageHead title={`${t("money.cash_book")}: ${account.name}`}>
+        <SmallLink href={`/reports/cash_book?party=${account.id}&from=${from}&to=${to}`}>
+          {t("reports.excel")} / {t("reports.pdf")}
+        </SmallLink>
+      </PageHead>
       <form className="card grid gap-3 md:grid-cols-[10rem_10rem_auto] md:items-end">
         <Field label={t("sale.from")}>
           <input type="date" name="from" defaultValue={from} className="field" />
