@@ -19,7 +19,12 @@
     "suppliers": "Suppliers",
     "sales": "Sales",
     "new_sale": "New sale",
-    "purchases": "Purchases"
+    "purchases": "Purchases",
+    "money": "Money",
+    "expenses": "Expenses",
+    "cheques": "Cheques",
+    "stock": "Stock",
+    "review": "Needs review"
   },
   "login": {
     "title": "Log in",
@@ -92,7 +97,14 @@
     "NUMBER_EXISTS": "This number is already on this part.",
     "ALIAS_EXISTS": "This word is already there.",
     "VEHICLE_EXISTS": "This vehicle is already in the list.",
-    "NOT_OWNER": "Only the owner can do this."
+    "NOT_OWNER": "Only the owner can do this.",
+    "PAYMENT_EXCEEDS_PAYABLE": "Cannot pay more than the shop owes the supplier.",
+    "BALANCE_BELOW_ZERO": "The account is below zero in the books, so the day cannot be closed.",
+    "DAY_ALREADY_CLOSED": "This day is already closed.",
+    "CATEGORY_EXISTS": "This category is already there.",
+    "DATE_IN_FUTURE": "A date in the future is not allowed.",
+    "CHEQUE_STATUS": "This cannot be done to the cheque as it is now.",
+    "PART_TWICE": "The same part was given twice."
   },
   "fields": {
     "nameEn": "English name",
@@ -131,7 +143,20 @@
     "creditLimit": "Credit limit",
     "note": "Note",
     "verified": "Verified",
-    "vehicleId": "Vehicle"
+    "vehicleId": "Vehicle",
+    "amount": "Amount",
+    "method": "Method",
+    "accountId": "Account",
+    "openingBalance": "Opening balance",
+    "accountNumber": "Number",
+    "fromId": "From",
+    "toId": "To",
+    "counted": "Counted",
+    "change": "Quantity",
+    "reason": "Reason",
+    "date": "Date",
+    "trxId": "TrxID",
+    "cheque": "Cheque details"
   },
   "value": {
     "quality": {
@@ -224,6 +249,34 @@
     "payment_status": {
       "completed": "Received",
       "reversed": "Reversed"
+    },
+    "ref": {
+      "sale": "Sale",
+      "return": "Return",
+      "purchase": "Purchase",
+      "customer_payment": "Customer payment",
+      "supplier_payment": "Supplier payment",
+      "expense": "Expense",
+      "transfer": "Transfer",
+      "cheque": "Cheque",
+      "sale_payment": "Paid at sale"
+    },
+    "cheque_status": {
+      "pending": "Pending",
+      "deposited": "Deposited",
+      "cleared": "Cleared",
+      "bounced": "Bounced",
+      "cancelled": "Cancelled"
+    },
+    "cheque_direction": {
+      "received": "Received",
+      "issued": "Issued"
+    },
+    "adjust_reason": {
+      "count": "Count",
+      "damage": "Damaged",
+      "lost": "Lost",
+      "found": "Found"
     }
   },
   "parts": {
@@ -427,5 +480,92 @@
     "reverse_hint": "Reversing takes the stock out and lowers what the shop owes. The average cost goes back if nothing has moved the part since.",
     "count": "{{count}} purchases",
     "search_label": "Bill number or supplier"
+  },
+  "money": {
+    "title": "Money",
+    "accounts": "Accounts",
+    "balance": "Balance",
+    "total": "Total",
+    "add_account": "New account",
+    "edit_account": "Edit account",
+    "inactive": "Inactive",
+    "added": "Account added.",
+    "transfer": "From one account to another",
+    "transferred": "Transferred.",
+    "cash_book": "Cash book",
+    "opening": "Opening",
+    "money_in": "In",
+    "money_out": "Out",
+    "closing": "Closing",
+    "what": "What",
+    "no_moves": "No movements in this period.",
+    "close_day": "Close the day",
+    "expected": "In the books",
+    "difference": "Difference",
+    "closed": "Day closed. Difference {{difference}}",
+    "closings": "Earlier days",
+    "open_cash_book": "Cash book",
+    "opening_hint": "What the account held before today"
+  },
+  "expenses": {
+    "title": "Expenses",
+    "add": "Record an expense",
+    "total": "Total expenses",
+    "none": "No expenses in this period.",
+    "add_category": "New category",
+    "add_defaults": "Add the six usual categories",
+    "no_categories": "No expense categories yet.",
+    "saved": "Expense recorded."
+  },
+  "cheques": {
+    "title": "Cheque register",
+    "all": "All",
+    "party": "Party",
+    "bank": "Bank",
+    "number": "Cheque number",
+    "due_date": "Date",
+    "status": "Status",
+    "deposit": "Deposited",
+    "clear": "Cleared",
+    "bounce": "Bounced",
+    "into_account": "Into which bank account",
+    "none": "No cheques.",
+    "direction": "Received / issued",
+    "bounce_hint": "A bounced cheque puts the amount back on the customer's due or the supplier's payable."
+  },
+  "stock": {
+    "title": "Stock",
+    "value": "Stock value (at average cost)",
+    "value_parts": "in {{count}} parts",
+    "low": "Low stock",
+    "dead": "Dead stock (no sale in 90 days)",
+    "none_low": "No parts are low.",
+    "none_dead": "No dead stock.",
+    "adjust": "Adjust stock",
+    "change_hint": "Up, e.g. 2; down, e.g. -2",
+    "adjusted": "Stock adjusted.",
+    "count": "Count a rack",
+    "pick_rack": "Pick a rack",
+    "in_books": "In the books",
+    "save_count": "Save the count",
+    "counted_saved": "Stock corrected for {{count}} parts.",
+    "last_sale": "Last sale",
+    "never": "Never",
+    "reorder": "Reorder at",
+    "worth": "Value",
+    "count_hint": "Fill in only the parts you counted; empty boxes change nothing."
+  },
+  "review": {
+    "title": "Needs review",
+    "negative": "Stock below zero",
+    "missing_trx": "Mobile payments without a TrxID",
+    "add_trx": "Add the TrxID",
+    "none": "Nothing to review.",
+    "trx_added": "TrxID added.",
+    "negative_hint": "Sold with no stock in the books. Record the purchase or count the stock."
+  },
+  "supplier_pay": {
+    "title": "Pay the supplier",
+    "saved": "Payment made."
   }
 }

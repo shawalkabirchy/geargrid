@@ -1,4 +1,4 @@
-import { PART_NUMBER_KINDS } from "@geargrid/db";
+import { PART_NUMBER_KINDS, STOCK_ADJUSTMENT_REASONS } from "@geargrid/db";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { database } from "../../../../src/server/db";
@@ -13,6 +13,7 @@ import {
   removeFitmentAction,
   removeNumberAction,
 } from "../../catalog-actions";
+import { adjustStockAction } from "../../money-actions";
 import { cell, Check, Field, money, PageHead, small, Table } from "../../ui";
 
 // One part (GearGrid plan 8.1, "Part details"): its record and prices, numbers, shop words, the vehicles it fits and
@@ -126,6 +127,35 @@ export default async function PartPage({ params }: { params: Promise<{ id: strin
           </dl>
         </section>
       </div>
+
+      <section className="card" data-testid="adjust">
+        <h2 className="mb-3 text-lg font-semibold">{t("stock.adjust")}</h2>
+        <ActionForm
+          action={adjustStockAction}
+          reset
+          className="grid gap-3 md:grid-cols-[10rem_12rem_1fr_auto] md:items-end"
+        >
+          <input type="hidden" name="partId" value={part.id} />
+          <Field label={t("fields.change")} hint={t("stock.change_hint")}>
+            <input name="change" required inputMode="decimal" className="field" />
+          </Field>
+          <Field label={t("fields.reason")}>
+            <select name="reason" className="field">
+              {STOCK_ADJUSTMENT_REASONS.map((reason) => (
+                <option key={reason} value={reason}>
+                  {t(`value.adjust_reason.${reason}`)}
+                </option>
+              ))}
+            </select>
+          </Field>
+          <Field label={t("fields.note")} hint={t("form.optional")}>
+            <input name="note" maxLength={200} className="field" />
+          </Field>
+          <button type="submit" className="button-primary">
+            {t("common.save")}
+          </button>
+        </ActionForm>
+      </section>
 
       <section className="card" data-testid="numbers">
         <h2 className="mb-3 text-lg font-semibold">{t("part.numbers")}</h2>

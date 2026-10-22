@@ -210,6 +210,8 @@ export async function moveMoney(
     refType: string;
     refId: string;
     now: Date;
+    /** A transfer's note (slice C). */
+    note?: string | null;
   },
 ): Promise<void> {
   const id = uuidv7();
@@ -220,6 +222,7 @@ export async function moveMoney(
     amount: move.amount,
     refType: move.refType,
     refId: move.refId,
+    note: move.note ?? null,
     createdAt: move.now,
     updatedAt: move.now,
   });

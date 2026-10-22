@@ -47,6 +47,21 @@ export default async function ShopLayout({ children }: { children: ReactNode }) 
             <Link href="/aliases" className="hover:underline">
               {t("nav.aliases")}
             </Link>
+            <Link href="/money" className="hover:underline">
+              {t("nav.money")}
+            </Link>
+            <Link href="/expenses" className="hover:underline">
+              {t("nav.expenses")}
+            </Link>
+            <Link href="/cheques" className="hover:underline">
+              {t("nav.cheques")}
+            </Link>
+            <Link href="/stock" className="hover:underline">
+              {t("nav.stock")}
+            </Link>
+            <Link href="/review" className="hover:underline">
+              {t("nav.review")}
+            </Link>
             <Link href="/settings" className="hover:underline">
               {t("nav.settings")}
             </Link>
