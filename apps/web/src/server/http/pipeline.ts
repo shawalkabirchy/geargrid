@@ -5,6 +5,7 @@ import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import { authenticate, requireScope, type Actor, type Scope } from "../auth/api-key";
 import { database, type Tx } from "../db";
+import type { AuditActor } from "../posting";
 import { canonicalHash } from "./canonical";
 import { apiError, errorResponse } from "./errors";
 
@@ -12,9 +13,10 @@ import { apiError, errorResponse } from "./errors";
 // path, query and body with the endpoint's schema; one READ COMMITTED transaction in which a real POST first claims its
 // Idempotency-Key; the service; commit (writing the answer into the claimed row), or roll back for a dry run.
 
-export interface Context<P, Q, B> {
+/** A service's inputs. Services that the web dashboard also calls take any AuditActor (A), not only an API key. */
+export interface Context<P, Q, B, A extends AuditActor = Actor> {
   tx: Tx;
-  actor: Actor;
+  actor: A;
   now: Date;
   params: P;
   query: Q;

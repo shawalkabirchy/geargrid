@@ -16,9 +16,24 @@ export default async function ShopLayout({ children }: { children: ReactNode }) 
           <Link href="/" className="text-xl font-bold">
             {settings.shopName}
           </Link>
-          <nav className="flex gap-4 text-lg">
+          <nav className="flex flex-wrap gap-x-4 gap-y-1 text-lg">
             <Link href="/" className="hover:underline">
               {t("nav.home")}
+            </Link>
+            <Link href="/parts" className="hover:underline">
+              {t("nav.parts")}
+            </Link>
+            <Link href="/customers" className="hover:underline">
+              {t("nav.customers")}
+            </Link>
+            <Link href="/suppliers" className="hover:underline">
+              {t("nav.suppliers")}
+            </Link>
+            <Link href="/vehicles" className="hover:underline">
+              {t("nav.vehicles")}
+            </Link>
+            <Link href="/aliases" className="hover:underline">
+              {t("nav.aliases")}
             </Link>
             <Link href="/settings" className="hover:underline">
               {t("nav.settings")}

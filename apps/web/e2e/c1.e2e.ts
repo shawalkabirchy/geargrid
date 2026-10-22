@@ -1,8 +1,8 @@
 import { expect, test } from "@playwright/test";
+import { OWNER_EMAIL } from "./login";
 
 // C1 (DokaanBondhu spec D193): login, Home, Settings, the language switch and logout, on the seeded shop.
 
-const OWNER_EMAIL = "owner@demo-auto-parts.test";
 const PASSWORD = process.env.WEB_TEST_PASSWORD ?? "";
 
 test("a page behind the login sends a visitor to the login page", async ({ page }) => {

@@ -1,5 +1,7 @@
 {
-  "app": { "name": "GearGrid" },
+  "app": {
+    "name": "GearGrid"
+  },
   "common": {
     "taka": "{{amount}} taka",
     "save": "Save",
@@ -9,7 +11,12 @@
     "home": "Home",
     "settings": "Settings",
     "logout": "Log out",
-    "language": "বাংলা"
+    "language": "বাংলা",
+    "parts": "Parts",
+    "vehicles": "Vehicles",
+    "aliases": "Shop words",
+    "customers": "Customers",
+    "suppliers": "Suppliers"
   },
   "login": {
     "title": "Log in",
@@ -61,5 +68,238 @@
     "round_off_10": "10 taka",
     "saved": "Saved.",
     "invalid": "Some fields are not right: {{fields}}"
+  },
+  "form": {
+    "invalid": "Some fields are not right: {{fields}}",
+    "saved": "Saved.",
+    "added": "Added.",
+    "removed": "Removed.",
+    "add": "Add",
+    "remove": "Remove",
+    "edit": "Edit",
+    "cancel": "Cancel",
+    "back": "Back",
+    "none": "—",
+    "yes": "Yes",
+    "no": "No",
+    "search": "Search",
+    "optional": "(optional)"
+  },
+  "web": {
+    "NUMBER_EXISTS": "This number is already on this part.",
+    "ALIAS_EXISTS": "This word is already there.",
+    "VEHICLE_EXISTS": "This vehicle is already in the list.",
+    "NOT_OWNER": "Only the owner can do this."
+  },
+  "fields": {
+    "nameEn": "English name",
+    "nameBn": "Bangla name",
+    "categoryId": "Category",
+    "brandId": "Brand",
+    "newBrand": "New brand",
+    "vehicleType": "For",
+    "quality": "Quality",
+    "position": "Position",
+    "unit": "Unit",
+    "packSize": "Pack size",
+    "rackLocation": "Rack",
+    "retailPrice": "Retail price",
+    "garagePrice": "Garage (paikari) price",
+    "reorderLevel": "Reorder level",
+    "notes": "Notes",
+    "isActive": "Active",
+    "mainNumber": "Main part number",
+    "number": "Part number",
+    "kind": "Kind",
+    "brand": "Brand",
+    "isMain": "Main number",
+    "aliasText": "Word",
+    "make": "Make",
+    "model": "Model",
+    "yearFrom": "From year",
+    "yearTo": "To year",
+    "engineCode": "Engine code",
+    "body": "Body",
+    "name": "Name",
+    "phone": "Phone",
+    "address": "Address",
+    "type": "Type",
+    "priceTier": "Price tier",
+    "creditLimit": "Credit limit",
+    "note": "Note",
+    "verified": "Verified",
+    "vehicleId": "Vehicle"
+  },
+  "value": {
+    "quality": {
+      "genuine": "Genuine",
+      "aftermarket": "Aftermarket",
+      "reconditioned": "Reconditioned",
+      "used": "Used"
+    },
+    "position": {
+      "front": "Front",
+      "rear": "Rear",
+      "left": "Left",
+      "right": "Right"
+    },
+    "unit": {
+      "piece": "Piece",
+      "set": "Set",
+      "pair": "Pair",
+      "liter": "Liter",
+      "box": "Box"
+    },
+    "vehicle_type": {
+      "car": "Car / microbus",
+      "motorcycle": "Motorcycle",
+      "both": "Both",
+      "microbus": "Microbus"
+    },
+    "number_kind": {
+      "oem": "OEM",
+      "aftermarket": "Other brand",
+      "supplier": "Supplier code"
+    },
+    "customer_type": {
+      "retail": "Retail",
+      "garage": "Garage / paikari"
+    },
+    "price_tier": {
+      "retail": "Retail price",
+      "garage": "Garage price"
+    },
+    "fitment_source": {
+      "excel": "Excel",
+      "catalog": "Catalog",
+      "owner": "Owner",
+      "ai": "DokaanBondhu"
+    },
+    "vehicle_source": {
+      "starter": "Starter list",
+      "shop": "Added by the shop"
+    },
+    "movement": {
+      "sale": "Sale",
+      "return": "Return",
+      "purchase": "Purchase",
+      "void": "Sale voided",
+      "adjustment": "Count / correction",
+      "opening": "Opening stock",
+      "purchase_reversal": "Purchase reversed"
+    },
+    "ledger": {
+      "opening": "Opening due",
+      "sale": "Sale",
+      "sale_payment": "Paid at sale",
+      "payment": "Payment",
+      "return": "Return",
+      "void": "Sale voided",
+      "void_payment": "Payment of voided sale",
+      "payment_reversal": "Payment reversed",
+      "cheque_bounce": "Cheque bounced",
+      "purchase": "Purchase",
+      "purchase_payment": "Paid at purchase",
+      "purchase_reversal": "Purchase reversed"
+    }
+  },
+  "parts": {
+    "title": "Parts",
+    "search_label": "Name, number or shop word",
+    "search_hint": "e.g. pad, self, 04465-10010",
+    "by_car": "Car model",
+    "any_model": "All models",
+    "year": "Year",
+    "new": "New part",
+    "count": "{{count}} parts",
+    "limited": "Showing the first {{count}}; narrow the search.",
+    "none_found": "No parts found.",
+    "inactive": "Inactive",
+    "stock": "Stock",
+    "retail": "Retail",
+    "garage": "Garage",
+    "rack": "Rack",
+    "part": "Part"
+  },
+  "part": {
+    "details": "Details",
+    "prices": "Prices",
+    "avg_cost": "Average cost",
+    "numbers": "Part numbers",
+    "main": "Main",
+    "aliases": "Shop words for this part",
+    "category_aliases": "Category words (apply to all its parts)",
+    "fitment": "Fits",
+    "no_fitment": "No vehicles linked. A search by car model will not show this part.",
+    "verified": "Verified",
+    "unverified": "Not verified",
+    "stock_history": "Stock history (last 50)",
+    "no_movements": "No stock movements yet.",
+    "date": "Date",
+    "reason": "Reason",
+    "change": "Quantity",
+    "unit_cost": "Cost",
+    "bill": "Bill",
+    "edit": "Edit part",
+    "new_title": "New part",
+    "edit_title": "Edit part",
+    "new_brand_hint": "Type it here if it is not in the list",
+    "garage_blank": "Leave empty to use the retail price",
+    "no_stock_hint": "A new part starts with no stock; a purchase or a count brings it in.",
+    "no_position": "None",
+    "no_brand": "No brand",
+    "pick_vehicle": "Pick a vehicle"
+  },
+  "vehicles": {
+    "title": "Vehicles",
+    "add": "New vehicle",
+    "parts": "Parts",
+    "years": "Years",
+    "still_made": "now",
+    "year_to_blank": "Empty = still made",
+    "source": "Source"
+  },
+  "aliases": {
+    "title": "Shop words",
+    "intro": "The names the shop uses for parts (for example self = starter). A category word finds every part in that category. DokaanBondhu knows these words too.",
+    "for_category": "For a category",
+    "for_part": "For one part",
+    "target": "For",
+    "add_category": "Add a category word"
+  },
+  "customers": {
+    "title": "Customers",
+    "search_label": "Name or phone",
+    "new": "New customer",
+    "total_due": "Total due",
+    "due": "Due",
+    "credit_limit": "Credit limit",
+    "no_limit": "No limit",
+    "ledger": "Credit ledger",
+    "debit": "Due up",
+    "credit": "Due down",
+    "balance": "Due after",
+    "entry": "Entry",
+    "none": "No customers found.",
+    "empty_ledger": "Nothing in the ledger yet.",
+    "more": "Older lines are not shown here.",
+    "edit": "Customer details",
+    "remove": "Remove customer",
+    "remove_hint": "The ledger is empty, so the customer can be removed.",
+    "limit_blank": "Empty = no limit",
+    "tier_hint": "Starts from the type; can be changed here"
+  },
+  "suppliers": {
+    "title": "Suppliers",
+    "new": "New supplier",
+    "total_payable": "Total payable",
+    "payable": "Payable",
+    "ledger": "Supplier ledger",
+    "debit": "Payable up",
+    "credit": "Payable down",
+    "balance": "Payable after",
+    "none": "No suppliers found.",
+    "edit": "Supplier details",
+    "remove": "Remove supplier"
   }
 }

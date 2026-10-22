@@ -15,6 +15,10 @@ export interface PageContext {
   taka: (amount: bigint) => string;
   /** dd/mm/yyyy, in Bangla digits when the shop uses them. */
   date: (value: string | Date) => string;
+  /** A quantity without its trailing zeros ("3.000" as 3, "1.500" as 1.5), in the shop's digits. */
+  qty: (value: string | number) => string;
+  /** Plain digits written the shop's way (years, counts). */
+  digits: (text: string | number) => string;
 }
 
 export async function pageContext(): Promise<PageContext> {
@@ -30,5 +34,7 @@ export async function pageContext(): Promise<PageContext> {
     taka: (amount) =>
       t("common.taka", { amount: formatTaka(amount, { banglaDigits: settings.banglaDigits }) }),
     date: (value) => digits(formatDate(value)),
+    qty: (value) => digits(String(Number(value))),
+    digits: (text) => digits(String(text)),
   };
 }

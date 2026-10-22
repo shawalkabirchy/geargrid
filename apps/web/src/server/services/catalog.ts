@@ -4,7 +4,7 @@ import { and, eq, isNull, sql } from "drizzle-orm";
 import { apiError } from "../http/errors";
 import { takaOrNull, taka } from "../http/json";
 import type { Answer, Context } from "../http/pipeline";
-import { audit, changed } from "../posting";
+import { audit, changed, type AuditActor } from "../posting";
 import { fitmentView } from "./reads";
 
 // Price changes and fitment links (spec 6.5): PATCH /parts/{id}/price, POST /fitments, PATCH /fitments/{id}. Only the
@@ -29,7 +29,7 @@ export async function updatePrice({
   now,
   params,
   body,
-}: Context<{ id: string }, undefined, PriceInput>): Promise<Answer> {
+}: Context<{ id: string }, undefined, PriceInput, AuditActor>): Promise<Answer> {
   const [part] = await tx
     .select()
     .from(parts)
@@ -65,7 +65,7 @@ export async function addFitment({
   actor,
   now,
   body,
-}: Context<undefined, undefined, FitmentInput>): Promise<Answer> {
+}: Context<undefined, undefined, FitmentInput, AuditActor>): Promise<Answer> {
   const [part] = await tx
     .select({ id: parts.id })
     .from(parts)
@@ -113,7 +113,7 @@ export async function updateFitment({
   now,
   params,
   body,
-}: Context<{ id: string }, undefined, FitmentChange>): Promise<Answer> {
+}: Context<{ id: string }, undefined, FitmentChange, AuditActor>): Promise<Answer> {
   const [row] = await tx
     .select()
     .from(fitments)

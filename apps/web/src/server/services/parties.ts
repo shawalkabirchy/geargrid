@@ -1,9 +1,10 @@
 import { uuidv7 } from "@geargrid/core";
 import { customerLedger, customers, supplierLedger, suppliers } from "@geargrid/db";
 import { and, eq, isNull, sql } from "drizzle-orm";
+import type { Tx } from "../db";
 import { apiError } from "../http/errors";
 import type { Answer, Context } from "../http/pipeline";
-import { audit, changed } from "../posting";
+import { audit, changed, type AuditActor } from "../posting";
 import { customerView, supplierView } from "./reads";
 
 // New customers and suppliers (spec 6.5, D173): POST /customers and /suppliers with a dry run, and PATCH
@@ -38,7 +39,7 @@ export async function addCustomer({
   now,
   body,
   dryRun,
-}: Context<undefined, undefined, CustomerInput>): Promise<Answer> {
+}: Context<undefined, undefined, CustomerInput, AuditActor>): Promise<Answer> {
   const [row] = await tx
     .insert(customers)
     .values({
@@ -68,7 +69,7 @@ export async function addSupplier({
   now,
   body,
   dryRun,
-}: Context<undefined, undefined, SupplierInput>): Promise<Answer> {
+}: Context<undefined, undefined, SupplierInput, AuditActor>): Promise<Answer> {
   const [row] = await tx
     .insert(suppliers)
     .values({
@@ -100,7 +101,7 @@ export async function updateCustomer({
   now,
   params,
   body,
-}: Context<{ id: string }, undefined, PartyChange>): Promise<Answer> {
+}: Context<{ id: string }, undefined, PartyChange, AuditActor>): Promise<Answer> {
   const [row] = await tx
     .select()
     .from(customers)
@@ -134,7 +135,7 @@ export async function updateSupplier({
   now,
   params,
   body,
-}: Context<{ id: string }, undefined, PartyChange>): Promise<Answer> {
+}: Context<{ id: string }, undefined, PartyChange, AuditActor>): Promise<Answer> {
   const [row] = await tx
     .select()
     .from(suppliers)
@@ -160,4 +161,47 @@ export async function updateSupplier({
   const view = supplierView(updated!);
   await audit(tx, actor, "supplier.update", "supplier", row.id, before, view);
   return { status: 200, body: { supplier: view } };
+}
+
+export interface CustomerEdit {
+  name: string;
+  phone: string | null;
+  address: string | null;
+  price_tier: "retail" | "garage";
+  credit_limit_taka: number | null;
+}
+
+/**
+ * The web dashboard's customer form (DokaanBondhu spec D193, C2): name, phone and address as PATCH does, plus the price
+ * tier, which starts from the type and can be changed per customer (GearGrid plan 2.1), and the credit limit.
+ */
+export async function editCustomer(
+  tx: Tx,
+  actor: AuditActor,
+  id: string,
+  body: CustomerEdit,
+  now = new Date(),
+): Promise<void> {
+  const [row] = await tx
+    .select()
+    .from(customers)
+    .where(and(eq(customers.id, id), isNull(customers.deletedAt)))
+    .for("update");
+  if (!row) throw apiError("NOT_FOUND", { entity: "customer", id });
+  const before = customerView(row);
+  const [updated] = await tx
+    .update(customers)
+    .set({
+      name: body.name,
+      phone: body.phone,
+      address: body.address,
+      priceTier: body.price_tier,
+      creditLimit: body.credit_limit_taka === null ? null : BigInt(body.credit_limit_taka),
+      updatedAt: now,
+      version: sql`${customers.version} + 1`,
+    })
+    .where(eq(customers.id, row.id))
+    .returning();
+  await changed(tx, "customers", row.id);
+  await audit(tx, actor, "customer.update", "customer", row.id, before, customerView(updated!));
 }

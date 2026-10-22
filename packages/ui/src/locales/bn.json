@@ -1,5 +1,7 @@
 {
-  "app": { "name": "গিয়ারগ্রিড" },
+  "app": {
+    "name": "গিয়ারগ্রিড"
+  },
   "common": {
     "taka": "{{amount}} টাকা",
     "save": "সেভ করুন",
@@ -9,7 +11,12 @@
     "home": "হোম",
     "settings": "সেটিংস",
     "logout": "লগ আউট",
-    "language": "English"
+    "language": "English",
+    "parts": "পার্টস",
+    "vehicles": "গাড়ি",
+    "aliases": "দোকানের শব্দ",
+    "customers": "কাস্টমার",
+    "suppliers": "সাপ্লায়ার"
   },
   "login": {
     "title": "লগ ইন",
@@ -61,5 +68,238 @@
     "round_off_10": "১০ টাকায়",
     "saved": "সেভ হয়েছে।",
     "invalid": "কিছু ঘর ঠিক নেই: {{fields}}"
+  },
+  "form": {
+    "invalid": "কিছু ঘর ঠিক নেই: {{fields}}",
+    "saved": "সেভ হয়েছে।",
+    "added": "যোগ হয়েছে।",
+    "removed": "মুছে ফেলা হয়েছে।",
+    "add": "যোগ করুন",
+    "remove": "মুছুন",
+    "edit": "বদলান",
+    "cancel": "বাতিল",
+    "back": "ফিরে যান",
+    "none": "—",
+    "yes": "হ্যাঁ",
+    "no": "না",
+    "search": "খুঁজুন",
+    "optional": "(না দিলেও চলে)"
+  },
+  "web": {
+    "NUMBER_EXISTS": "এই নম্বর এই পার্টে আগেই আছে।",
+    "ALIAS_EXISTS": "এই শব্দ আগেই আছে।",
+    "VEHICLE_EXISTS": "এই গাড়ি তালিকায় আগেই আছে।",
+    "NOT_OWNER": "শুধু মালিক এটা করতে পারেন।"
+  },
+  "fields": {
+    "nameEn": "ইংরেজি নাম",
+    "nameBn": "বাংলা নাম",
+    "categoryId": "ক্যাটাগরি",
+    "brandId": "ব্র্যান্ড",
+    "newBrand": "নতুন ব্র্যান্ড",
+    "vehicleType": "কোন গাড়ির",
+    "quality": "কোয়ালিটি",
+    "position": "পজিশন",
+    "unit": "একক",
+    "packSize": "প্যাকে কয়টি",
+    "rackLocation": "র‍্যাক",
+    "retailPrice": "খুচরা দাম",
+    "garagePrice": "পাইকারি (গ্যারেজ) দাম",
+    "reorderLevel": "কমপক্ষে স্টক",
+    "notes": "নোট",
+    "isActive": "চালু আছে",
+    "mainNumber": "মূল পার্ট নম্বর",
+    "number": "পার্ট নম্বর",
+    "kind": "ধরন",
+    "brand": "ব্র্যান্ড",
+    "isMain": "মূল নম্বর",
+    "aliasText": "শব্দ",
+    "make": "কোম্পানি",
+    "model": "মডেল",
+    "yearFrom": "শুরুর সাল",
+    "yearTo": "শেষ সাল",
+    "engineCode": "ইঞ্জিন কোড",
+    "body": "বডি",
+    "name": "নাম",
+    "phone": "ফোন",
+    "address": "ঠিকানা",
+    "type": "ধরন",
+    "priceTier": "দামের স্তর",
+    "creditLimit": "বাকির সীমা",
+    "note": "নোট",
+    "verified": "যাচাই করা",
+    "vehicleId": "গাড়ি"
+  },
+  "value": {
+    "quality": {
+      "genuine": "জেনুইন",
+      "aftermarket": "আফটারমার্কেট",
+      "reconditioned": "রিকন্ডিশন",
+      "used": "পুরোনো"
+    },
+    "position": {
+      "front": "সামনে",
+      "rear": "পেছনে",
+      "left": "বামে",
+      "right": "ডানে"
+    },
+    "unit": {
+      "piece": "পিস",
+      "set": "সেট",
+      "pair": "জোড়া",
+      "liter": "লিটার",
+      "box": "বক্স"
+    },
+    "vehicle_type": {
+      "car": "কার / মাইক্রো",
+      "motorcycle": "মোটরসাইকেল",
+      "both": "দুটোই",
+      "microbus": "মাইক্রোবাস"
+    },
+    "number_kind": {
+      "oem": "কোম্পানির (OEM)",
+      "aftermarket": "অন্য ব্র্যান্ডের",
+      "supplier": "সাপ্লায়ারের কোড"
+    },
+    "customer_type": {
+      "retail": "খুচরা",
+      "garage": "গ্যারেজ / পাইকারি"
+    },
+    "price_tier": {
+      "retail": "খুচরা দাম",
+      "garage": "পাইকারি দাম"
+    },
+    "fitment_source": {
+      "excel": "এক্সেল",
+      "catalog": "ক্যাটালগ",
+      "owner": "মালিক",
+      "ai": "দোকানবন্ধু"
+    },
+    "vehicle_source": {
+      "starter": "শুরুর তালিকা",
+      "shop": "দোকানের যোগ করা"
+    },
+    "movement": {
+      "sale": "বিক্রি",
+      "return": "ফেরত",
+      "purchase": "কেনা",
+      "void": "বিক্রি বাতিল",
+      "adjustment": "গণনা / ঠিক করা",
+      "opening": "শুরুর স্টক",
+      "purchase_reversal": "কেনা ফেরানো"
+    },
+    "ledger": {
+      "opening": "শুরুর বাকি",
+      "sale": "বিক্রি",
+      "sale_payment": "বিক্রিতে জমা",
+      "payment": "জমা",
+      "return": "ফেরত",
+      "void": "বিক্রি বাতিল",
+      "void_payment": "বাতিলে জমা ফেরত",
+      "payment_reversal": "জমা ফেরানো",
+      "cheque_bounce": "চেক বাউন্স",
+      "purchase": "কেনা",
+      "purchase_payment": "কেনায় দেওয়া",
+      "purchase_reversal": "কেনা ফেরানো"
+    }
+  },
+  "parts": {
+    "title": "পার্টস",
+    "search_label": "নাম, নম্বর বা দোকানের শব্দ",
+    "search_hint": "যেমন: প্যাড, self, 04465-10010",
+    "by_car": "গাড়ির মডেল",
+    "any_model": "সব মডেল",
+    "year": "সাল",
+    "new": "নতুন পার্ট",
+    "count": "{{count}}টি পার্ট",
+    "limited": "প্রথম {{count}}টি দেখানো হলো, খোঁজ আরও নির্দিষ্ট করুন।",
+    "none_found": "কোনো পার্ট পাওয়া যায়নি।",
+    "inactive": "বন্ধ",
+    "stock": "স্টক",
+    "retail": "খুচরা",
+    "garage": "পাইকারি",
+    "rack": "র‍্যাক",
+    "part": "পার্ট"
+  },
+  "part": {
+    "details": "বিস্তারিত",
+    "prices": "দাম",
+    "avg_cost": "গড় কেনা দাম",
+    "numbers": "পার্ট নম্বর",
+    "main": "মূল",
+    "aliases": "এই পার্টের দোকানের শব্দ",
+    "category_aliases": "ক্যাটাগরির শব্দ (সব পার্টে খাটে)",
+    "fitment": "কোন গাড়িতে লাগে",
+    "no_fitment": "কোনো গাড়ি যুক্ত নেই। গাড়ির মডেল দিয়ে খুঁজলে এই পার্ট আসবে না।",
+    "verified": "যাচাই করা",
+    "unverified": "যাচাই হয়নি",
+    "stock_history": "স্টকের হিসাব (সর্বশেষ ৫০টি)",
+    "no_movements": "এখনো কোনো আসা-যাওয়া নেই।",
+    "date": "তারিখ",
+    "reason": "কারণ",
+    "change": "পরিমাণ",
+    "unit_cost": "দাম",
+    "bill": "বিল",
+    "edit": "পার্ট বদলান",
+    "new_title": "নতুন পার্ট",
+    "edit_title": "পার্ট বদলান",
+    "new_brand_hint": "তালিকায় না থাকলে এখানে লিখুন",
+    "garage_blank": "খালি রাখলে খুচরা দামই নেওয়া হবে",
+    "no_stock_hint": "নতুন পার্টের স্টক শূন্য থেকে শুরু; কেনা বা গণনায় স্টক আসবে।",
+    "no_position": "নেই",
+    "no_brand": "ব্র্যান্ড নেই",
+    "pick_vehicle": "গাড়ি বেছে নিন"
+  },
+  "vehicles": {
+    "title": "গাড়ির তালিকা",
+    "add": "নতুন গাড়ি",
+    "parts": "পার্ট",
+    "years": "সাল",
+    "still_made": "এখনো",
+    "year_to_blank": "খালি = এখনো তৈরি হয়",
+    "source": "কোথা থেকে"
+  },
+  "aliases": {
+    "title": "দোকানের শব্দ",
+    "intro": "দোকানে যে নামে পার্ট ডাকা হয় (যেমন self = স্টার্টার)। ক্যাটাগরির শব্দে সেই ক্যাটাগরির সব পার্ট আসে। দোকানবন্ধুও এই শব্দগুলো চেনে।",
+    "for_category": "ক্যাটাগরির জন্য",
+    "for_part": "একটি পার্টের জন্য",
+    "target": "কার জন্য",
+    "add_category": "ক্যাটাগরির শব্দ যোগ করুন"
+  },
+  "customers": {
+    "title": "কাস্টমার",
+    "search_label": "নাম বা ফোন",
+    "new": "নতুন কাস্টমার",
+    "total_due": "মোট বাকি",
+    "due": "বাকি",
+    "credit_limit": "বাকির সীমা",
+    "no_limit": "সীমা নেই",
+    "ledger": "বাকির খাতা",
+    "debit": "বাকি বাড়ল",
+    "credit": "বাকি কমল",
+    "balance": "বাকি থাকল",
+    "entry": "কী",
+    "none": "কোনো কাস্টমার পাওয়া যায়নি।",
+    "empty_ledger": "খাতায় এখনো কিছু নেই।",
+    "more": "আরও পুরোনো লাইন আছে, এখানে দেখানো হয়নি।",
+    "edit": "কাস্টমারের তথ্য",
+    "remove": "কাস্টমার মুছুন",
+    "remove_hint": "খাতায় কিছু নেই বলে মুছে ফেলা যায়।",
+    "limit_blank": "খালি = সীমা নেই",
+    "tier_hint": "ধরন থেকে শুরু হয়, এখানে বদলানো যায়"
+  },
+  "suppliers": {
+    "title": "সাপ্লায়ার",
+    "new": "নতুন সাপ্লায়ার",
+    "total_payable": "মোট দেনা",
+    "payable": "দেনা",
+    "ledger": "সাপ্লায়ারের খাতা",
+    "debit": "দেনা বাড়ল",
+    "credit": "দেনা কমল",
+    "balance": "দেনা থাকল",
+    "none": "কোনো সাপ্লায়ার পাওয়া যায়নি।",
+    "edit": "সাপ্লায়ারের তথ্য",
+    "remove": "সাপ্লায়ার মুছুন"
   }
 }
