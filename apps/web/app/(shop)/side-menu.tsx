@@ -98,10 +98,11 @@ export function SideMenu({
         <Link
           href="/sales/new"
           onClick={close}
-          className={`button-main ml-auto min-h-11 px-3 text-base lg:hidden ${onFrame}`}
+          className={`button-main ml-auto min-h-11 min-w-11 px-3 text-base whitespace-nowrap lg:hidden ${onFrame}`}
         >
           <Plus className="size-5" aria-hidden="true" />
-          {newSale}
+          {/* only the plus on a narrow phone; the name stays for screen readers */}
+          <span className="sr-only min-[440px]:not-sr-only">{newSale}</span>
         </Link>
         <button
           type="button"

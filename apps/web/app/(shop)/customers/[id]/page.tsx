@@ -136,7 +136,10 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
       {payments.length > 0 && (
         <section className="card">
           <h2 className="mb-3 text-lg font-semibold">{t("payment.list")}</h2>
-          <Table head={[t("part.date"), t("sale.amount"), t("sale.method"), t("sale.account"), ""]}>
+          <Table
+            right={[1]}
+            head={[t("part.date"), t("sale.amount"), t("sale.method"), t("sale.account"), ""]}
+          >
             {payments.map((payment) => (
               <tr key={payment.id} className={payment.status === "reversed" ? "text-stone-400" : ""}>
                 <td className={cell}>{page.date(payment.received_at)}</td>

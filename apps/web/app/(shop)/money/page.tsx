@@ -26,7 +26,7 @@ export default async function MoneyPage() {
       <PageHead title={t("money.title")} />
       <section className="card">
         <h2 className="mb-3 text-lg font-semibold">{t("money.accounts")}</h2>
-        <Table head={[f("name"), f("kind"), f("accountNumber"), t("money.balance"), ""]}>
+        <Table right={[3]} head={[f("name"), f("kind"), f("accountNumber"), t("money.balance"), ""]}>
           {accounts.map((a) => (
             <tr key={a.id} className={a.is_active ? "" : "text-stone-400"}>
               <td className={`${cell} font-medium`}>

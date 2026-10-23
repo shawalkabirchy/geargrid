@@ -5,7 +5,7 @@ import { purchaseDetail } from "../../../../src/server/services/trade-reads";
 import { pageContext } from "../../../../src/web/page-context";
 import { ActionForm } from "../../action-form";
 import { reversePurchaseAction } from "../../trade-actions";
-import { cell, Field, money, PageHead, Table } from "../../ui";
+import { Badge, cell, Field, money, PageHead, Table } from "../../ui";
 
 // One purchase: the supplier, its lines and payments, and the reversal (spec 6.5, D93).
 
@@ -23,8 +23,8 @@ export default async function PurchasePage({ params }: { params: Promise<{ id: s
           <>
             {purchase.supplier} · {date(purchase.purchase_time)}
             {reversed && (
-              <span className="ml-2 rounded bg-red-100 px-2 text-base text-red-800">
-                {t("value.purchase_status.reversed")}
+              <span className="ml-2 align-middle">
+                <Badge tone="owed">{t("value.purchase_status.reversed")}</Badge>
               </span>
             )}
           </>
@@ -38,7 +38,10 @@ export default async function PurchasePage({ params }: { params: Promise<{ id: s
           </Link>
           {purchase.bill_no && ` · ${t("purchase.bill_no")}: ${purchase.bill_no}`}
         </p>
-        <Table head={[t("sale.part"), t("sale.qty"), t("purchase.unit_cost"), t("sale.line_total")]}>
+        <Table
+          right={[2, 3]}
+          head={[t("sale.part"), t("sale.qty"), t("purchase.unit_cost"), t("sale.line_total")]}
+        >
           {items.map((item) => (
             <tr key={item.id}>
               <td className={cell}>

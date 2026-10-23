@@ -6,7 +6,7 @@ import { allAccounts, listCheques } from "../../../src/server/services/money";
 import { pageContext } from "../../../src/web/page-context";
 import { ActionForm } from "../action-form";
 import { moveChequeAction } from "../money-actions";
-import { cell, money, PageHead, small, Table } from "../ui";
+import { cell, money, PageHead, small, smallDanger, Table } from "../ui";
 
 // The cheque register (GearGrid plan 2.8, 2.11): cheques received from customers and issued to suppliers; a pending
 // one is deposited, cleared into or out of a bank account, or bounced (its amount goes back on the ledger).
@@ -43,6 +43,7 @@ export default async function ChequesPage({ searchParams }: { searchParams: Sear
           <p className="text-stone-600">{t("cheques.none")}</p>
         ) : (
           <Table
+            right={[4]}
             head={[
               t("cheques.due_date"),
               t("cheques.direction"),
@@ -70,13 +71,13 @@ export default async function ChequesPage({ searchParams }: { searchParams: Sear
                     </Link>
                   </td>
                   <td className={cell}>
-                    {c.bank} <span className="text-sm text-stone-500">{c.cheque_no}</span>
+                    {c.bank} <span className="block text-sm text-stone-500">{c.cheque_no}</span>
                   </td>
                   <td className={money}>{taka(BigInt(c.amount))}</td>
                   <td className={cell}>{t(`value.cheque_status.${c.status}`)}</td>
                   <td className={cell}>
                     {open && (
-                      <div className="flex flex-wrap items-center gap-2">
+                      <div className="flex flex-col items-start gap-2">
                         {c.direction === "received" && c.status === "pending" && (
                           <ActionForm action={moveChequeAction} className="inline">
                             <input type="hidden" name="id" value={c.id} />
@@ -86,13 +87,13 @@ export default async function ChequesPage({ searchParams }: { searchParams: Sear
                             </button>
                           </ActionForm>
                         )}
-                        <ActionForm action={moveChequeAction} className="flex items-center gap-2">
+                        <ActionForm action={moveChequeAction} className="flex flex-col items-start gap-2">
                           <input type="hidden" name="id" value={c.id} />
                           <input type="hidden" name="action" value="clear" />
                           <select
                             name="accountId"
                             aria-label={t("cheques.into_account")}
-                            className="rounded-lg border border-stone-300 px-2 py-1.5"
+                            className="field mt-0 min-h-10 w-44 text-base"
                           >
                             {banks.map((a) => (
                               <option key={a.id} value={a.id}>
@@ -107,7 +108,7 @@ export default async function ChequesPage({ searchParams }: { searchParams: Sear
                         <ActionForm action={moveChequeAction} className="inline">
                           <input type="hidden" name="id" value={c.id} />
                           <input type="hidden" name="action" value="bounce" />
-                          <button type="submit" className={`${small} text-red-700`}>
+                          <button type="submit" className={smallDanger}>
                             {t("cheques.bounce")}
                           </button>
                         </ActionForm>

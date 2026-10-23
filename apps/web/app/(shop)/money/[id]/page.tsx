@@ -75,6 +75,7 @@ export default async function CashBookPage({
           <p className="text-stone-600">{t("money.no_moves")}</p>
         ) : (
           <Table
+            right={[3, 4]}
             head={[
               t("part.date"),
               t("money.what"),
@@ -123,7 +124,10 @@ export default async function CashBookPage({
           {past.length > 0 && (
             <div className="mt-4">
               <h3 className="mb-2 font-semibold">{t("money.closings")}</h3>
-              <Table head={[f("date"), t("money.expected"), f("counted"), t("money.difference")]}>
+              <Table
+                right={[1, 2, 3]}
+                head={[f("date"), t("money.expected"), f("counted"), t("money.difference")]}
+              >
                 {past.map((row) => (
                   <tr key={row.id}>
                     <td className={cell}>{date(row.date)}</td>

@@ -55,7 +55,10 @@ export default async function StockPage() {
         {dead.length === 0 ? (
           <p className="text-stone-600">{t("stock.none_dead")}</p>
         ) : (
-          <Table head={[t("parts.part"), t("parts.stock"), t("stock.worth"), t("stock.last_sale")]}>
+          <Table
+            right={[2]}
+            head={[t("parts.part"), t("parts.stock"), t("stock.worth"), t("stock.last_sale")]}
+          >
             {dead.map((row) => (
               <tr key={row.id}>
                 <td className={cell}>{name(row)}</td>

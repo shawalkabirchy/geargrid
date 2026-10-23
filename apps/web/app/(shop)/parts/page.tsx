@@ -77,7 +77,7 @@ export default async function PartsPage({ searchParams }: { searchParams: Search
           >
             {hits.map((part) => (
               <tr key={part.id} className={part.is_active ? "" : "text-stone-400"}>
-                <td className={cell}>
+                <td className={`${cell} min-w-56`}>
                   <Link href={`/parts/${part.id}`} className="font-medium text-brand-ink hover:underline">
                     {part.name_bn ?? part.name_en}
                   </Link>

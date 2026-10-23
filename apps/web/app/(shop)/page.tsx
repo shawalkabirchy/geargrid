@@ -60,7 +60,7 @@ export default async function HomePage() {
                     <span className="block text-sm text-stone-600">{t(`account_kind.${account.kind}`)}</span>
                   </td>
                   <td
-                    className={`py-3 text-right font-semibold tabular-nums ${account.balance < 0n ? "text-red-700" : ""}`}
+                    className={`py-3 text-right font-semibold whitespace-nowrap tabular-nums ${account.balance < 0n ? "text-red-700" : ""}`}
                   >
                     {taka(account.balance)}
                   </td>

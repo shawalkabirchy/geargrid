@@ -230,7 +230,7 @@ export function PurchaseForm({
         type="button"
         disabled={pending}
         onClick={() => save(false)}
-        className="button-primary w-full text-xl md:w-auto"
+        className="button-main w-full text-xl md:w-auto"
       >
         {labels.save}
       </button>

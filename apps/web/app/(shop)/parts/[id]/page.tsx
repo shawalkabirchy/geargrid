@@ -178,9 +178,7 @@ export default async function PartPage({ params }: { params: Promise<{ id: strin
                 {t(`value.number_kind.${n.kind}`)}
                 {n.brand && ` · ${n.brand}`}
               </span>
-              {n.is_main && (
-                <span className="rounded bg-brand-soft px-2 text-sm text-brand-ink">{t("part.main")}</span>
-              )}
+              {n.is_main && <Badge tone="brand">{t("part.main")}</Badge>}
               <Remove action={removeNumberAction} id={n.id} partId={part.id} label={t("form.remove")} />
             </li>
           ))}

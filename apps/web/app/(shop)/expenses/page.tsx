@@ -105,7 +105,7 @@ export default async function ExpensesPage({ searchParams }: { searchParams: Sea
         {rows.length === 0 ? (
           <p className="text-stone-600">{t("expenses.none")}</p>
         ) : (
-          <Table head={[f("date"), f("categoryId"), f("accountId"), f("note"), f("amount")]}>
+          <Table right={[4]} head={[f("date"), f("categoryId"), f("accountId"), f("note"), f("amount")]}>
             {rows.map((row) => (
               <tr key={row.id}>
                 <td className={cell}>{date(row.spent_at)}</td>

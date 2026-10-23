@@ -8,7 +8,7 @@ import { saleDetail } from "../../../../src/server/services/trade-reads";
 import { pageContext } from "../../../../src/web/page-context";
 import { ActionForm } from "../../action-form";
 import { voidSaleAction } from "../../trade-actions";
-import { cell, Field, money, Table } from "../../ui";
+import { Badge, cell, Field, money, Table } from "../../ui";
 import { PrintButton } from "../../print-button";
 
 // One sale as its bill (GearGrid plan 8.1, appendix "Sample WhatsApp bill"): the shop, the lines, the totals and how it
@@ -91,7 +91,9 @@ export default async function SalePage({ params }: { params: Promise<{ id: strin
           <div>
             {t("sale.invoice")}: <strong data-testid="invoice-no">{sale.invoice_no}</strong>
             {isVoid && (
-              <span className="ml-2 rounded bg-red-100 px-2 text-red-800">{t("value.sale_status.void")}</span>
+              <span className="ml-2">
+                <Badge tone="owed">{t("value.sale_status.void")}</Badge>
+              </span>
             )}
           </div>
           <div>{date(sale.sale_time)}</div>
@@ -109,7 +111,7 @@ export default async function SalePage({ params }: { params: Promise<{ id: strin
             )}
           </div>
         </div>
-        <Table head={[t("sale.part"), t("sale.qty"), t("sale.price"), t("sale.line_total")]}>
+        <Table right={[2, 3]} head={[t("sale.part"), t("sale.qty"), t("sale.price"), t("sale.line_total")]}>
           {items.map((item) => (
             <tr key={item.id}>
               <td className={cell}>
@@ -185,6 +187,7 @@ export default async function SalePage({ params }: { params: Promise<{ id: strin
         <section className="card print:hidden">
           <h2 className="mb-2 text-lg font-semibold">{t("sale.returns")}</h2>
           <Table
+            right={[1, 2, 3]}
             head={[
               t("sale.date"),
               t("return.total"),

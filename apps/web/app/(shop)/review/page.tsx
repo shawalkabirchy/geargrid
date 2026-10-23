@@ -41,7 +41,7 @@ export default async function ReviewPage() {
       {missingTrx.length > 0 && (
         <section className="card">
           <h2 className="mb-3 text-lg font-semibold">{t("review.missing_trx")}</h2>
-          <Table head={[t("part.date"), t("money.what"), t("sale.method"), t("sale.amount"), ""]}>
+          <Table right={[3]} head={[t("part.date"), t("money.what"), t("sale.method"), t("sale.amount"), ""]}>
             {missingTrx.map((row) => (
               <tr key={row.id} data-testid="missing-trx">
                 <td className={cell}>{date(row.at)}</td>

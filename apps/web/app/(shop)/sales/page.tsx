@@ -64,6 +64,7 @@ export default async function SalesPage({ searchParams }: { searchParams: Search
           <p className="text-stone-600">{t("sale.none")}</p>
         ) : (
           <Table
+            right={[3, 4, 5]}
             head={[
               t("sale.invoice"),
               t("sale.date"),

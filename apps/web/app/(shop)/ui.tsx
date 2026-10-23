@@ -93,7 +93,8 @@ export function Table({
 }) {
   return (
     <div className="overflow-x-auto">
-      <table className="w-full text-left [&_tbody_tr:hover]:bg-stone-50">
+      {/* At least 36rem wide: on a phone the table scrolls inside its card instead of crushing its columns. */}
+      <table className="w-full min-w-[36rem] text-left [&_tbody_tr:hover]:bg-stone-50">
         <thead>
           <tr className="border-b-[1.5px] border-stone-200 text-sm text-stone-600">
             {head.map((label, index) => (
@@ -151,5 +152,8 @@ export function SmallLink({ href, children }: { href: string; children: ReactNod
 
 export const cell = "border-t border-stone-200 px-3 py-3";
 export const money = `${cell} text-right tabular-nums whitespace-nowrap`;
-export const small =
-  "inline-flex min-h-10 items-center justify-center gap-1.5 rounded-lg border-[1.5px] border-stone-300 bg-white px-3 text-base font-semibold text-brand-ink hover:bg-stone-100";
+const smallBase =
+  "inline-flex min-h-10 items-center justify-center gap-1.5 rounded-lg border-[1.5px] border-stone-300 bg-white px-3 text-base font-semibold hover:bg-stone-100";
+export const small = `${smallBase} text-brand-ink`;
+/** A small button that undoes or refuses something: a bounced cheque. */
+export const smallDanger = `${smallBase} text-red-700`;

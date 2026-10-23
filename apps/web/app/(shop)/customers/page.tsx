@@ -35,6 +35,7 @@ export default async function CustomersPage({ searchParams }: { searchParams: Se
           <p className="text-stone-600">{t("customers.none")}</p>
         ) : (
           <Table
+            right={[3, 4]}
             head={[
               t("fields.name"),
               t("fields.type"),

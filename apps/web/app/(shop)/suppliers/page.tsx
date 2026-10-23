@@ -34,7 +34,7 @@ export default async function SuppliersPage({ searchParams }: { searchParams: Se
         {suppliers.length === 0 ? (
           <p className="text-stone-600">{t("suppliers.none")}</p>
         ) : (
-          <Table head={[t("fields.name"), t("fields.phone"), t("suppliers.payable")]}>
+          <Table right={[2]} head={[t("fields.name"), t("fields.phone"), t("suppliers.payable")]}>
             {suppliers.map((s) => (
               <tr key={s.id}>
                 <td className={cell}>

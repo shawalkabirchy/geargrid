@@ -50,6 +50,7 @@ export default async function PurchasesPage({ searchParams }: { searchParams: Se
           <p className="text-stone-600">{t("purchase.none")}</p>
         ) : (
           <Table
+            right={[3, 4, 5]}
             head={[
               t("sale.date"),
               t("purchase.supplier"),
