@@ -26,11 +26,11 @@ export function ReportTables({ page, result }: { page: PageContext; result: Repo
             <div className="overflow-x-auto">
               <table className="w-full text-left">
                 <thead>
-                  <tr className="border-b border-stone-300 text-sm text-stone-600">
+                  <tr className="border-b-[1.5px] border-stone-200 text-sm text-stone-600">
                     {table.columns.map((column) => (
                       <th
                         key={column.key}
-                        className={`px-2 py-2 font-medium ${column.kind === "text" || column.kind === "date" ? "" : "text-right"}`}
+                        className={`px-3 py-2.5 font-medium whitespace-nowrap ${column.kind === "text" || column.kind === "date" ? "" : "text-right"}`}
                       >
                         {column.label}
                       </th>
@@ -43,7 +43,7 @@ export function ReportTables({ page, result }: { page: PageContext; result: Repo
                     return (
                       <tr
                         key={r}
-                        className={`${row._strong || total ? "font-semibold" : ""} ${total ? "border-t-2 border-stone-400" : "border-t border-stone-100"}`}
+                        className={`${row._strong || total ? "font-semibold" : ""} ${total ? "border-t-[1.5px] border-stone-900" : "border-t border-stone-200 hover:bg-stone-50"}`}
                       >
                         {table.columns.map((column) => {
                           const value = row[column.key] ?? null;
@@ -51,7 +51,7 @@ export function ReportTables({ page, result }: { page: PageContext; result: Repo
                           return (
                             <td
                               key={column.key}
-                              className={`px-2 py-1.5 ${column.kind === "text" || column.kind === "date" ? "" : "text-right tabular-nums"} ${negative ? "text-red-700" : ""}`}
+                              className={`px-3 py-2.5 ${column.kind === "text" || column.kind === "date" ? "" : "text-right tabular-nums"} ${negative ? "text-red-700" : ""}`}
                             >
                               {show(page, value, column.kind)}
                             </td>

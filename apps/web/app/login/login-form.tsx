@@ -11,18 +11,18 @@ export function LoginForm({
   const [state, action, pending] = useActionState<FormState, FormData>(loginAction, { status: "idle" });
   const message = state.message === "login.too_many" ? labels.too_many : state.message ? labels.failed : null;
   return (
-    <form action={action} className="space-y-4 rounded-xl bg-white p-6 shadow-sm">
-      <h2 className="text-xl font-semibold">{labels.title}</h2>
+    <form action={action} className="space-y-5">
+      <h2 className="text-3xl font-bold">{labels.title}</h2>
       <label className="block">
-        <span className="text-stone-700">{labels.email}</span>
+        <span className="font-medium text-stone-700">{labels.email}</span>
         <input name="email" type="email" required autoComplete="username" className="field" />
       </label>
       <label className="block">
-        <span className="text-stone-700">{labels.password}</span>
+        <span className="font-medium text-stone-700">{labels.password}</span>
         <input name="password" type="password" required autoComplete="current-password" className="field" />
       </label>
       {message && (
-        <p role="alert" className="text-red-700">
+        <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-red-700">
           {message}
         </p>
       )}

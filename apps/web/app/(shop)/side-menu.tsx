@@ -25,6 +25,7 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, type ReactNode } from "react";
+import { Mark } from "../mark";
 
 // The menu of every logged-in page (DokaanBondhu spec D207): from 1024 px a sidebar in the indigo frame, sticky with
 // its own scroll; on a phone a top bar whose menu button opens the same links. The links exist once, so each keeps
@@ -60,27 +61,6 @@ const ICONS: Record<string, LucideIcon> = {
   audit: History,
   settings: SlidersHorizontal,
 };
-
-/** GearGrid's mark: a grid of nine with the marigold at its centre. */
-function Mark() {
-  return (
-    <svg viewBox="0 0 30 30" className="size-9 flex-none" aria-hidden="true">
-      {[0, 11, 22].flatMap((y) =>
-        [0, 11, 22].map((x) => (
-          <rect
-            key={`${x}-${y}`}
-            x={x}
-            y={y}
-            width="8"
-            height="8"
-            rx="2"
-            fill={x === 11 && y === 11 ? "#f4b400" : "#3a47a8"}
-          />
-        )),
-      )}
-    </svg>
-  );
-}
 
 const onFrame = "focus-visible:outline-marigold";
 

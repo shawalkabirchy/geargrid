@@ -7,7 +7,7 @@ import {
   type CarFilter,
 } from "../../../src/server/services/catalog-reads";
 import { pageContext } from "../../../src/web/page-context";
-import { ButtonLink, cell, Field, money, PageHead, Table } from "../ui";
+import { Badge, ButtonLink, cell, Field, money, PageHead, Table } from "../ui";
 
 // Parts search (GearGrid plan 2.3, 8.1): one box for a name, a part number or a shop word, and the "by car model"
 // picker; results with quality, stock, both prices and the rack.
@@ -56,7 +56,7 @@ export default async function PartsPage({ searchParams }: { searchParams: Search
       </form>
 
       <section className="card">
-        <p className="mb-2 text-stone-600" data-testid="part-count">
+        <p className="mb-3 text-stone-600" data-testid="part-count">
           {hits.length === 0
             ? t("parts.none_found")
             : hits.length >= SEARCH_LIMIT
@@ -65,6 +65,7 @@ export default async function PartsPage({ searchParams }: { searchParams: Search
         </p>
         {hits.length > 0 && (
           <Table
+            right={[2, 3, 4]}
             head={[
               t("parts.part"),
               t("fields.quality"),
@@ -81,8 +82,8 @@ export default async function PartsPage({ searchParams }: { searchParams: Search
                     {part.name_bn ?? part.name_en}
                   </Link>
                   {!part.is_active && (
-                    <span className="ml-2 rounded bg-stone-200 px-1.5 text-sm text-stone-600">
-                      {t("parts.inactive")}
+                    <span className="ml-2">
+                      <Badge>{t("parts.inactive")}</Badge>
                     </span>
                   )}
                   <div className="text-sm text-stone-500">
@@ -92,12 +93,14 @@ export default async function PartsPage({ searchParams }: { searchParams: Search
                   </div>
                 </td>
                 <td className={cell}>
-                  {t(`value.quality.${part.quality}`)}
+                  <Badge tone={part.quality === "genuine" ? "brand" : "neutral"}>
+                    {t(`value.quality.${part.quality}`)}
+                  </Badge>
                   {part.position && (
-                    <div className="text-sm text-stone-500">{t(`value.position.${part.position}`)}</div>
+                    <div className="mt-1 text-sm text-stone-500">{t(`value.position.${part.position}`)}</div>
                   )}
                 </td>
-                <td className={`${cell} tabular-nums ${Number(part.stock) <= 0 ? "text-red-700" : ""}`}>
+                <td className={`${money} ${Number(part.stock) <= 0 ? "font-semibold text-red-700" : ""}`}>
                   {qty(part.stock)} {t(`value.unit.${part.unit}`)}
                 </td>
                 <td className={money}>{taka(BigInt(part.retail_price))}</td>

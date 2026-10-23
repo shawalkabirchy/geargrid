@@ -16,11 +16,12 @@ export function Field({
   children: ReactNode;
   className?: string;
 }) {
+  // The hint sits between the label and the box, so the boxes of a row line up at the bottom (D207).
   return (
     <label className={`block ${className}`}>
       <span className="font-medium text-stone-700">{label}</span>
+      {hint && <span className="block text-sm text-stone-500">{hint}</span>}
       {children}
-      {hint && <span className="mt-1 block text-sm text-stone-500">{hint}</span>}
     </label>
   );
 }

@@ -36,6 +36,7 @@
   },
   "login": {
     "title": "Log in",
+    "tagline": "Sales, credit ledgers, stock and money, in one place.",
     "email": "Email",
     "password": "Password",
     "submit": "Log in",
@@ -434,6 +435,7 @@
     "due": "Due",
     "credit_limit": "Credit limit",
     "no_limit": "No limit",
+    "limit_used": "{{percent, digits}}% of the limit used",
     "ledger": "Credit ledger",
     "debit": "Due up",
     "credit": "Due down",

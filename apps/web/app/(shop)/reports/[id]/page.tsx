@@ -1,5 +1,6 @@
 import { addDays, dhakaDate } from "@geargrid/core";
 import { CHEQUE_STATUSES } from "@geargrid/db";
+import { Download } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { database } from "../../../../src/server/db";
@@ -15,6 +16,10 @@ import { ReportTables } from "../report-tables";
 // tables, and the Excel download, the print / PDF and, for a statement, WhatsApp.
 
 type Search = Promise<Record<string, string | string[] | undefined>>;
+
+/** The quick range now shown, filled in indigo (D207). */
+const CHOSEN =
+  "inline-flex min-h-10 items-center justify-center rounded-lg border-[1.5px] border-brand bg-brand px-3 text-base font-semibold text-white";
 
 /** A Bangladeshi mobile number for wa.me (8801XXXXXXXXX), or "" for WhatsApp's own picker. */
 const whatsappNumber = (phone: string | null) => {
@@ -62,9 +67,10 @@ export default async function ReportPage({
       <PageHead title={result.title}>
         <a
           href={`/export/report/${def.id}?${reportQuery(query)}`}
-          className="button-primary inline-flex items-center print:hidden"
+          className="button-secondary print:hidden"
           download
         >
+          <Download className="size-5" aria-hidden="true" />
           {t("reports.excel")}
         </a>
         <span className="print:hidden">
@@ -75,7 +81,7 @@ export default async function ReportPage({
             href={`https://wa.me/${whatsappNumber(result.share.phone)}?text=${encodeURIComponent(result.share.text)}`}
             target="_blank"
             rel="noreferrer"
-            className="button-primary inline-flex items-center print:hidden"
+            className="button-primary print:hidden"
           >
             {t("sale.whatsapp")}
           </a>
@@ -90,11 +96,19 @@ export default async function ReportPage({
         <form className="card space-y-3 print:hidden" data-testid="report-filters">
           {def.filters.includes("range") && (
             <div className="flex flex-wrap gap-2">
-              {presets.map(([label, change]) => (
-                <Link key={label} href={link(change)} className={small}>
-                  {t(label)}
-                </Link>
-              ))}
+              {presets.map(([label, change]) => {
+                const chosen = change.from === query.from && change.to === query.to;
+                return (
+                  <Link
+                    key={label}
+                    href={link(change)}
+                    aria-current={chosen ? "true" : undefined}
+                    className={chosen ? CHOSEN : small}
+                  >
+                    {t(label)}
+                  </Link>
+                );
+              })}
             </div>
           )}
           <div className="flex flex-wrap items-end gap-3">

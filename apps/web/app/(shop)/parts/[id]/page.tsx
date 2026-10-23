@@ -14,7 +14,7 @@ import {
   removeNumberAction,
 } from "../../catalog-actions";
 import { adjustStockAction } from "../../money-actions";
-import { cell, Check, Field, money, PageHead, small, SmallLink, Table } from "../../ui";
+import { Badge, cell, Check, Field, money, PageHead, small, SmallLink, Table } from "../../ui";
 
 // One part (GearGrid plan 8.1, "Part details"): its record and prices, numbers, shop words, the vehicles it fits and
 // its stock history, with the owner's changes in place.
@@ -62,72 +62,82 @@ export default async function PartPage({ params }: { params: Promise<{ id: strin
             {part.name_bn ?? part.name_en}
             {part.name_bn && <span className="ml-2 text-lg font-normal text-stone-500">{part.name_en}</span>}
             {!part.is_active && (
-              <span className="ml-2 rounded bg-stone-200 px-2 text-base text-stone-600">
-                {t("parts.inactive")}
+              <span className="ml-2 align-middle">
+                <Badge>{t("parts.inactive")}</Badge>
               </span>
             )}
           </>
         }
       >
-        <Link href={`/parts/${part.id}/edit`} className="button-primary inline-flex items-center">
+        <Link href={`/parts/${part.id}/edit`} className="button-primary">
           {t("part.edit")}
         </Link>
         <SmallLink href={`/audit?entity=part&id=${part.id}`}>{t("audit.history")}</SmallLink>
       </PageHead>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <section className="card">
-          <h2 className="mb-3 text-lg font-semibold">{t("part.details")}</h2>
-          <dl className="grid grid-cols-[10rem_1fr] gap-y-2">
-            <dt className="text-stone-500">{t("fields.categoryId")}</dt>
-            <dd>{part.category}</dd>
-            <dt className="text-stone-500">{t("fields.brandId")}</dt>
-            <dd>{part.brand ?? t("form.none")}</dd>
-            <dt className="text-stone-500">{t("fields.vehicleType")}</dt>
-            <dd>{t(`value.vehicle_type.${part.vehicle_type}`)}</dd>
-            <dt className="text-stone-500">{t("fields.quality")}</dt>
-            <dd>
+      {/* What the counter needs at a glance (D207): the stock, the rack and both prices. */}
+      <section className="card grid grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-4">
+        <div className="flex flex-col gap-1">
+          <span className="text-stone-600">{t("parts.stock")}</span>
+          <span
+            data-testid="part-stock"
+            className={`figure text-3xl font-bold ${Number(part.stock) <= 0 ? "text-red-700" : ""}`}
+          >
+            {qty(part.stock)} {unit}
+          </span>
+        </div>
+        <div className="flex flex-col gap-1">
+          <span className="text-stone-600">{t("fields.rackLocation")}</span>
+          <span className="text-3xl font-bold">{part.rack_location ?? t("form.none")}</span>
+        </div>
+        <div className="flex flex-col gap-1">
+          <span className="text-stone-600">{t("fields.retailPrice")}</span>
+          <span className="figure text-3xl font-bold">{taka(BigInt(part.retail_price))}</span>
+        </div>
+        <div className="flex flex-col gap-1">
+          <span className="text-stone-600">{t("fields.garagePrice")}</span>
+          <span className="figure text-3xl font-bold">
+            {part.garage_price === null ? t("form.none") : taka(BigInt(part.garage_price))}
+          </span>
+        </div>
+      </section>
+
+      <section className="card">
+        <h2 className="mb-3 text-xl font-semibold">{t("part.details")}</h2>
+        <dl className="grid gap-x-8 gap-y-2 sm:grid-cols-[10rem_1fr] lg:grid-cols-[10rem_1fr_10rem_1fr]">
+          <dt className="text-stone-600">{t("fields.categoryId")}</dt>
+          <dd>{part.category}</dd>
+          <dt className="text-stone-600">{t("fields.brandId")}</dt>
+          <dd>{part.brand ?? t("form.none")}</dd>
+          <dt className="text-stone-600">{t("fields.vehicleType")}</dt>
+          <dd>{t(`value.vehicle_type.${part.vehicle_type}`)}</dd>
+          <dt className="text-stone-600">{t("fields.quality")}</dt>
+          <dd className="flex flex-wrap items-center gap-2">
+            <Badge tone={part.quality === "genuine" ? "brand" : "neutral"}>
               {t(`value.quality.${part.quality}`)}
-              {part.position && ` · ${t(`value.position.${part.position}`)}`}
-            </dd>
-            <dt className="text-stone-500">{t("fields.rackLocation")}</dt>
-            <dd>{part.rack_location ?? t("form.none")}</dd>
-            <dt className="text-stone-500">{t("parts.stock")}</dt>
-            <dd data-testid="part-stock" className={Number(part.stock) <= 0 ? "text-red-700" : ""}>
-              {qty(part.stock)} {unit}
-            </dd>
-            <dt className="text-stone-500">{t("fields.reorderLevel")}</dt>
-            <dd>
-              {qty(part.reorder_level)} {unit}
-            </dd>
-            {part.pack_size && (
-              <>
-                <dt className="text-stone-500">{t("fields.packSize")}</dt>
-                <dd>{qty(part.pack_size)}</dd>
-              </>
-            )}
-            {part.notes && (
-              <>
-                <dt className="text-stone-500">{t("fields.notes")}</dt>
-                <dd className="whitespace-pre-line">{part.notes}</dd>
-              </>
-            )}
-          </dl>
-        </section>
-        <section className="card">
-          <h2 className="mb-3 text-lg font-semibold">{t("part.prices")}</h2>
-          <dl className="grid grid-cols-[12rem_1fr] gap-y-2 text-lg">
-            <dt className="text-stone-500">{t("fields.retailPrice")}</dt>
-            <dd className="tabular-nums">{taka(BigInt(part.retail_price))}</dd>
-            <dt className="text-stone-500">{t("fields.garagePrice")}</dt>
-            <dd className="tabular-nums">
-              {part.garage_price === null ? t("form.none") : taka(BigInt(part.garage_price))}
-            </dd>
-            <dt className="text-stone-500">{t("part.avg_cost")}</dt>
-            <dd className="tabular-nums">{taka(BigInt(part.avg_cost))}</dd>
-          </dl>
-        </section>
-      </div>
+            </Badge>
+            {part.position && <span>{t(`value.position.${part.position}`)}</span>}
+          </dd>
+          <dt className="text-stone-600">{t("fields.reorderLevel")}</dt>
+          <dd>
+            {qty(part.reorder_level)} {unit}
+          </dd>
+          <dt className="text-stone-600">{t("part.avg_cost")}</dt>
+          <dd className="tabular-nums">{taka(BigInt(part.avg_cost))}</dd>
+          {part.pack_size && (
+            <>
+              <dt className="text-stone-600">{t("fields.packSize")}</dt>
+              <dd>{qty(part.pack_size)}</dd>
+            </>
+          )}
+          {part.notes && (
+            <>
+              <dt className="text-stone-600">{t("fields.notes")}</dt>
+              <dd className="whitespace-pre-line">{part.notes}</dd>
+            </>
+          )}
+        </dl>
+      </section>
 
       <section className="card" data-testid="adjust">
         <h2 className="mb-3 text-lg font-semibold">{t("stock.adjust")}</h2>
@@ -291,6 +301,7 @@ export default async function PartPage({ params }: { params: Promise<{ id: strin
           <p className="text-stone-600">{t("part.no_movements")}</p>
         ) : (
           <Table
+            right={[3, 4]}
             head={[t("part.date"), t("part.reason"), t("part.bill"), t("part.change"), t("part.unit_cost")]}
           >
             {movements.map((m) => (
