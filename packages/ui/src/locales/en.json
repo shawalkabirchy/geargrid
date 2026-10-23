@@ -799,7 +799,7 @@
     },
     "no_kind": "Pick what to import.",
     "no_file": "Pick a file.",
-    "too_big": "The file is over 5 MB.",
+    "too_big": "The file is over 4 MB.",
     "file": {
       "UNREADABLE": "The file could not be read. Give an .xlsx Excel file.",
       "EMPTY": "The file has no rows.",

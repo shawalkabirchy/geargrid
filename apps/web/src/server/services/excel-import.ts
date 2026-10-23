@@ -37,7 +37,8 @@ export const IMPORT_KINDS = ["parts", "customers", "suppliers"] as const;
 export type ImportKind = (typeof IMPORT_KINDS)[number];
 
 export const MAX_ROWS = 5000;
-export const MAX_BYTES = 5 * 1024 * 1024;
+/** 4 MB, so the upload with its form fits Vercel's 4.5 MB request (DokaanBondhu spec D209). */
+export const MAX_BYTES = 4 * 1024 * 1024;
 
 /** The template's columns in order, with the appendix's example row. */
 export const TEMPLATES: Record<ImportKind, [string, string | number][]> = {
