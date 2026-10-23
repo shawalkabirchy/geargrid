@@ -27,7 +27,12 @@
     "review": "Needs review",
     "reports": "Reports",
     "import": "Excel import",
-    "audit": "History"
+    "audit": "History",
+    "menu": "Menu",
+    "group_daily": "Daily work",
+    "group_money": "Cash and accounts",
+    "group_catalog": "Stock and catalog",
+    "group_shop": "Shop"
   },
   "login": {
     "title": "Log in",

@@ -27,7 +27,12 @@
     "review": "দেখে নিন",
     "reports": "রিপোর্ট",
     "import": "এক্সেল ইমপোর্ট",
-    "audit": "ইতিহাস"
+    "audit": "ইতিহাস",
+    "menu": "মেনু",
+    "group_daily": "রোজের কাজ",
+    "group_money": "টাকা-পয়সা",
+    "group_catalog": "মাল আর তালিকা",
+    "group_shop": "দোকান"
   },
   "login": {
     "title": "লগ ইন",

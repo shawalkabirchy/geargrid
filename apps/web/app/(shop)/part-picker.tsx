@@ -1,5 +1,6 @@
 "use client";
 
+import { Search } from "lucide-react";
 import { useEffect, useState, useTransition } from "react";
 import { digitsText, type Labels } from "./client-format";
 import { findPartsAction, type PartChoice } from "./trade-actions";
@@ -39,23 +40,29 @@ export function PartPicker({
   return (
     <div className="relative">
       <label className="block">
-        <span className="text-stone-700">{labels.find_part}</span>
-        <input
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-          className="field"
-          aria-label={labels.find_part}
-          autoComplete="off"
-        />
+        <span className="font-medium text-stone-700">{labels.find_part}</span>
+        <span className="relative mt-1 block">
+          <Search
+            className="pointer-events-none absolute top-1/2 left-3.5 size-5 -translate-y-1/2 text-stone-500"
+            aria-hidden="true"
+          />
+          <input
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            className="field mt-0 pl-11"
+            aria-label={labels.find_part}
+            autoComplete="off"
+          />
+        </span>
       </label>
       {(hits.length > 0 || searched) && (
-        <ul className="absolute z-10 mt-1 max-h-80 w-full overflow-y-auto rounded-lg border border-stone-200 bg-white shadow-lg">
-          {hits.length === 0 && <li className="px-3 py-2 text-stone-500">{labels.no_hits}</li>}
+        <ul className="absolute z-10 mt-2 max-h-96 w-full overflow-y-auto rounded-xl border border-stone-200 bg-white p-1 shadow-xl shadow-stone-900/10">
+          {hits.length === 0 && <li className="px-3 py-3 text-stone-600">{labels.no_hits}</li>}
           {hits.map((part) => (
             <li key={part.id}>
               <button
                 type="button"
-                className="block w-full px-3 py-2 text-left hover:bg-brand-soft"
+                className="flex w-full flex-col items-start rounded-lg px-3 py-2.5 text-left hover:bg-brand-soft focus-visible:bg-brand-soft"
                 onClick={() => {
                   onPick(part);
                   setQuery("");
@@ -63,10 +70,14 @@ export function PartPicker({
                   setSearched(false);
                 }}
               >
-                <span className="font-medium">{part.name}</span>
-                <span className="ml-2 text-sm text-stone-500">
-                  {part.number} · {digitsText(Number(part.stock), banglaDigits)}
-                  {part.rack ? ` · ${part.rack}` : ""}
+                <span className="font-semibold">{part.name}</span>
+                <span className="flex flex-wrap gap-x-3 text-sm text-stone-600">
+                  <span>{part.number}</span>
+                  <span className="tabular-nums">
+                    {labels.in_stock?.replace("{{qty}}", digitsText(Number(part.stock), banglaDigits)) ??
+                      digitsText(Number(part.stock), banglaDigits)}
+                  </span>
+                  {part.rack && <span>{part.rack}</span>}
                 </span>
               </button>
             </li>

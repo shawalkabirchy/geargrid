@@ -1,5 +1,6 @@
 "use client";
 
+import { Plus, Trash2 } from "lucide-react";
 import type { AccountOption } from "../../src/server/services/trade-reads";
 import type { Labels } from "./client-format";
 
@@ -62,17 +63,17 @@ export function PaymentRows({
   const set = (index: number, change: Partial<PaymentRow>) =>
     onChange(rows.map((row, i) => (i === index ? { ...row, ...change } : row)));
   return (
-    <div className="space-y-3">
+    <div className="space-y-3 @container">
       {rows.map((row, index) => {
         const ofKind = accounts.filter((account) => account.kind === row.method);
         return (
           <div
             key={index}
-            className="grid gap-2 md:grid-cols-[10rem_9rem_1fr_auto] md:items-end"
+            className="grid gap-3 @sm:grid-cols-2 @3xl:grid-cols-[10rem_9rem_1fr_auto] @3xl:items-end"
             data-testid="payment-row"
           >
             <label className="block">
-              <span className="text-stone-700">{labels.method}</span>
+              <span className="font-medium text-stone-700">{labels.method}</span>
               <select
                 value={row.method}
                 onChange={(event) => set(index, { method: event.target.value as Method, accountId: "" })}
@@ -86,7 +87,7 @@ export function PaymentRows({
               </select>
             </label>
             <label className="block">
-              <span className="text-stone-700">{labels.amount}</span>
+              <span className="font-medium text-stone-700">{labels.amount}</span>
               <input
                 value={row.amount}
                 onChange={(event) => set(index, { amount: event.target.value })}
@@ -95,10 +96,10 @@ export function PaymentRows({
                 aria-label={labels.amount}
               />
             </label>
-            <div className="grid gap-2 md:grid-cols-2">
+            <div className="grid gap-3 @sm:col-span-2 @md:grid-cols-2 @3xl:col-span-1">
               {row.method !== "cheque" && ofKind.length > 1 && (
                 <label className="block">
-                  <span className="text-stone-700">{labels.account}</span>
+                  <span className="font-medium text-stone-700">{labels.account}</span>
                   <select
                     value={row.accountId}
                     onChange={(event) => set(index, { accountId: event.target.value })}
@@ -115,7 +116,7 @@ export function PaymentRows({
               )}
               {["bkash", "nagad", "rocket", "bank"].includes(row.method) && (
                 <label className="block">
-                  <span className="text-stone-700">{labels.trx_id}</span>
+                  <span className="font-medium text-stone-700">{labels.trx_id}</span>
                   <input
                     value={row.trxId}
                     onChange={(event) => set(index, { trxId: event.target.value })}
@@ -127,7 +128,7 @@ export function PaymentRows({
               {row.method === "cheque" && (
                 <>
                   <label className="block">
-                    <span className="text-stone-700">{labels.cheque_bank}</span>
+                    <span className="font-medium text-stone-700">{labels.cheque_bank}</span>
                     <input
                       value={row.chequeBank}
                       onChange={(event) => set(index, { chequeBank: event.target.value })}
@@ -135,7 +136,7 @@ export function PaymentRows({
                     />
                   </label>
                   <label className="block">
-                    <span className="text-stone-700">{labels.cheque_no}</span>
+                    <span className="font-medium text-stone-700">{labels.cheque_no}</span>
                     <input
                       value={row.chequeNo}
                       onChange={(event) => set(index, { chequeNo: event.target.value })}
@@ -143,7 +144,7 @@ export function PaymentRows({
                     />
                   </label>
                   <label className="block">
-                    <span className="text-stone-700">{labels.cheque_due}</span>
+                    <span className="font-medium text-stone-700">{labels.cheque_due}</span>
                     <input
                       type="date"
                       value={row.chequeDue}
@@ -158,10 +159,10 @@ export function PaymentRows({
               <button
                 type="button"
                 onClick={() => onChange(rows.filter((_, i) => i !== index))}
-                className="min-h-12 rounded-lg border border-stone-300 px-3"
+                className="inline-flex size-12 items-center justify-center justify-self-start rounded-xl text-stone-600 hover:bg-red-50 hover:text-red-700"
                 aria-label={labels.remove}
               >
-                ✕
+                <Trash2 className="size-5" aria-hidden="true" />
               </button>
             )}
           </div>
@@ -170,9 +171,10 @@ export function PaymentRows({
       <button
         type="button"
         onClick={() => onChange([...rows, emptyPayment("bkash")])}
-        className="rounded-lg border border-stone-300 px-3 py-1.5 hover:bg-stone-100"
+        className="inline-flex min-h-10 items-center gap-1.5 rounded-lg border-[1.5px] border-stone-300 bg-white px-3 font-semibold text-brand-ink hover:bg-stone-100"
       >
-        + {labels.add_payment}
+        <Plus className="size-4" aria-hidden="true" />
+        {labels.add_payment}
       </button>
     </div>
   );
