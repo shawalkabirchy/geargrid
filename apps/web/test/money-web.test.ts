@@ -156,11 +156,17 @@ describe.skipIf(!inCi)("money and stock on the web", () => {
     const book = await cashBook(db(), cash.id, addDays(today, -60), today);
     expect(book.closing).toBe(book.opening + book.moneyIn - book.moneyOut);
     expect(book.closing).toBe(BigInt((await account("cash")).balance));
-    // the seed's cash box and bank end below zero in the books, which the closing refuses; bKash is above zero
-    const bkash = await account("bkash");
+    // the seed keeps every account above zero (D230); a transfer takes the cash box below zero in the books, which
+    // the closing refuses, and a transfer back restores it
+    const short = Number(BigInt((await account("cash")).balance) + 1000n);
+    await run((tx) =>
+      transfer(tx, actor, { fromId: cash.id, toId: bank.id, amount: short, note: "below zero" }),
+    );
     await expect(
       run((tx) => closeDay(tx, actor, { accountId: cash.id, date: today, counted: 0 })),
     ).rejects.toMatchObject({ code: "BALANCE_BELOW_ZERO" });
+    await run((tx) => transfer(tx, actor, { fromId: bank.id, toId: cash.id, amount: short, note: "back" }));
+    const bkash = await account("bkash");
     const end = await balanceAt(db(), bkash.id, new Date(`${addDays(today, 1)}T00:00:00+06:00`));
     const closed = await run((tx) =>
       closeDay(tx, actor, { accountId: bkash.id, date: today, counted: Number(end) - 50 }),

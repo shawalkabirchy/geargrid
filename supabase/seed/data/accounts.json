@@ -3,7 +3,7 @@
     "name": "Cash box",
     "kind": "cash",
     "number": null,
-    "opening_balance_taka": 50000
+    "opening_balance_taka": 350000
   },
   {
     "name": "bKash",
@@ -27,6 +27,6 @@
     "name": "City Bank current account",
     "kind": "bank",
     "number": "1102-000000-001",
-    "opening_balance_taka": 300000
+    "opening_balance_taka": 500000
   }
 ]

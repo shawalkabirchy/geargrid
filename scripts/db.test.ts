@@ -55,6 +55,17 @@ describe.skipIf(!inCi)("seed and db:check", () => {
     expect(failures).toEqual([]);
   });
 
+  it("keeps every money account above zero all through the history (D230)", async () => {
+    const { rows } = await admin.query<{ name: string; lowest: string }>(
+      `select name, min(running) as lowest from (
+         select a.name, a.opening_balance + coalesce(sum(case when t.direction = 'in' then t.amount else -t.amount end)
+                  over (partition by a.id order by t.created_at, t.id rows unbounded preceding), 0) as running
+         from accounts a left join account_transactions t on t.account_id = a.id and t.deleted_at is null
+       ) moves group by name having min(running) < 0`,
+    );
+    expect(rows).toEqual([]);
+  });
+
   it("gives identical IDs and totals on two fresh databases", async () => {
     const now = new Date();
     const prints = [];
