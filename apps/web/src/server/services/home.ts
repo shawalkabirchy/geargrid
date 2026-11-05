@@ -2,7 +2,8 @@ import { addDays, dhakaDate, dhakaDay } from "@geargrid/core";
 import type { Db } from "@geargrid/db";
 import { sql } from "drizzle-orm";
 import type { Tx } from "../db";
-import { profitAndLoss } from "./reports";
+import { customerAging, profitAndLoss, profitByPeriod, salesBy } from "./reports";
+import { deadStock, lowStock, stockValue } from "./stock";
 
 // The home screen's today summary (GearGrid plan 2.11, "Today summary"): sales, profit, cash in hand, account
 // balances, dues collected, expenses and the cheques due in the next seven days. "Today" is the shop's day in Dhaka.
@@ -111,5 +112,73 @@ export async function todaySummary(db: Reader, now: Date): Promise<TodaySummary>
       amount: BigInt(row.amount),
       dueDate: row.due_date,
     })),
+  };
+}
+
+// Home's charts (DokaanBondhu spec D231): the last 30 days' sales and profit, the best sellers of those days, the
+// customer dues by age and a glance at the stock. Each is read through the report it summarises, so Home and the
+// reports always agree.
+
+export const TREND_DAYS = 30;
+export const BEST_SELLERS = 6;
+export const TOP_DEBTORS = 4;
+
+export interface DayTotal {
+  date: string;
+  sales: bigint;
+  profit: bigint;
+}
+
+export interface Debtor {
+  id: string;
+  name: string;
+  due: bigint;
+  /** Whole days since the oldest unpaid entry. */
+  days: number;
+}
+
+export interface HomeOverview {
+  /** The last TREND_DAYS Dhaka days, oldest first, today last; a day with no sale is listed at zero. */
+  days: DayTotal[];
+  best: { id: string; name: string; quantity: string; amount: bigint }[];
+  dues: {
+    total: bigint;
+    customers: number;
+    /** Up to 30 days old, 31 to 60, 61 to 90, and older. */
+    ages: [bigint, bigint, bigint, bigint];
+    top: Debtor[];
+  };
+  stock: { value: bigint; parts: number; low: number; dead: number };
+}
+
+export async function homeOverview(db: Reader, now: Date): Promise<HomeOverview> {
+  const today = dhakaDate(now);
+  const from = addDays(today, -(TREND_DAYS - 1));
+  const periods = await profitByPeriod(db, from, today, "day");
+  const best = await salesBy(db, "part", from, today);
+  const aging = await customerAging(db, now);
+  const value = await stockValue(db);
+  const low = await lowStock(db);
+  const dead = await deadStock(db, now);
+
+  const sum = (pick: (row: (typeof aging)[number]) => bigint) =>
+    aging.reduce((total, row) => total + pick(row), 0n);
+  return {
+    days: periods.map((row) => ({ date: row.period, sales: row.sales, profit: row.net })),
+    best: best
+      .slice(0, BEST_SELLERS)
+      .map((row) => ({ id: row.key, name: row.name, quantity: row.quantity, amount: row.amount })),
+    dues: {
+      total: sum((row) => row.due),
+      customers: aging.length,
+      ages: [sum((row) => row.d30), sum((row) => row.d60), sum((row) => row.d90), sum((row) => row.older)],
+      top: aging.slice(0, TOP_DEBTORS).map((row) => ({
+        id: row.id,
+        name: row.name,
+        due: row.due,
+        days: row.oldest === null ? 0 : Math.floor((now.getTime() - row.oldest.getTime()) / 86_400_000),
+      })),
+    },
+    stock: { value: value.value, parts: value.parts, low: low.length, dead: dead.length },
   };
 }

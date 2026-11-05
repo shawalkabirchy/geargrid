@@ -1,12 +1,21 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { POST as recordSale } from "../app/api/v1/sales/route";
 import { database } from "../src/server/db";
-import { accountBalances, todaySummary } from "../src/server/services/home";
+import {
+  accountBalances,
+  BEST_SELLERS,
+  homeOverview,
+  TOP_DEBTORS,
+  TREND_DAYS,
+  todaySummary,
+} from "../src/server/services/home";
+import { lowStock, stockValue } from "../src/server/services/stock";
 import { getSettings, setLanguage, settingsInput, updateSettings } from "../src/server/services/settings";
 import { call, createTestShop, first, inCi, type TestShop } from "./harness";
 
 // The web dashboard's first services (DokaanBondhu spec D193, C1): the home screen's today summary agrees with the
-// rows it sums and moves by exactly a new sale; settings save every field with a web audit row.
+// rows it sums and moves by exactly a new sale; Home's charts (D231) agree with today and with the rows they sum;
+// settings save every field with a web audit row.
 
 describe.skipIf(!inCi)("home and settings", () => {
   let shop: TestShop;
@@ -71,6 +80,36 @@ describe.skipIf(!inCi)("home and settings", () => {
        and due_date <= (now() at time zone 'Asia/Dhaka')::date + 7`,
     );
     expect(summary.chequesDue).toHaveLength(Number(due.count));
+  });
+
+  it("charts the last 30 days, the best sellers, the dues by age and the stock as the rows say (D231)", async () => {
+    const now = new Date();
+    const overview = await homeOverview(database(), now);
+    const today = await todaySummary(database(), now);
+    expect(overview.days).toHaveLength(TREND_DAYS);
+    expect(overview.days.at(-1)).toEqual({ date: today.date, sales: today.sales, profit: today.profit });
+    expect(overview.days.reduce((sum, day) => sum + day.sales, 0n)).toBeGreaterThan(0n);
+
+    expect(overview.best.length).toBeGreaterThan(0);
+    expect(overview.best.length).toBeLessThanOrEqual(BEST_SELLERS);
+    const amounts = overview.best.map((part) => part.amount);
+    expect([...amounts].sort((a, b) => (a < b ? 1 : a > b ? -1 : 0))).toEqual(amounts);
+
+    const dues = await first<{ total: string; count: string }>(
+      shop,
+      `select coalesce(sum(due_balance), 0) as total, count(*) as count from customers
+       where deleted_at is null and due_balance > 0`,
+    );
+    expect(overview.dues.total).toBe(BigInt(dues.total));
+    expect(overview.dues.customers).toBe(Number(dues.count));
+    expect(overview.dues.ages.reduce((sum, part) => sum + part, 0n)).toBe(overview.dues.total);
+    expect(overview.dues.top.length).toBeLessThanOrEqual(TOP_DEBTORS);
+    const owed = overview.dues.top.map((debtor) => debtor.due);
+    expect([...owed].sort((a, b) => (a < b ? 1 : a > b ? -1 : 0))).toEqual(owed);
+
+    const value = await stockValue(database());
+    expect(overview.stock).toMatchObject({ value: value.value, parts: value.parts });
+    expect(overview.stock.low).toBe((await lowStock(database())).length);
   });
 
   it("saves the settings with an audit row from the web, and refuses what is not allowed", async () => {
