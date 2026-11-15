@@ -7,10 +7,10 @@ import {
   type CarFilter,
 } from "../../../src/server/services/catalog-reads";
 import { pageContext } from "../../../src/web/page-context";
-import { Badge, ButtonLink, cell, Field, money, PageHead, Table } from "../ui";
+import { Badge, ButtonLink, cell, Field, money, PageHead, RowCard, Table } from "../ui";
 
 // Parts search (GearGrid plan 2.3, 8.1): one box for a name, a part number or a shop word, and the "by car model"
-// picker; results with quality, stock, both prices and the rack.
+// picker; results with quality, stock, both prices and the rack. On a phone the results are cards (D243).
 
 type Search = Promise<Record<string, string | string[] | undefined>>;
 
@@ -33,9 +33,12 @@ export default async function PartsPage({ searchParams }: { searchParams: Search
       <PageHead title={t("parts.title")}>
         <ButtonLink href="/parts/new">{t("parts.new")}</ButtonLink>
       </PageHead>
-      <form className="card mb-4 grid gap-4 md:grid-cols-[1fr_16rem_8rem_auto] md:items-end" role="search">
-        <Field label={t("parts.search_label")} hint={t("parts.search_hint")}>
-          <input name="q" defaultValue={q} className="field" autoFocus />
+      <form
+        className="card mb-4 grid grid-cols-[minmax(0,1fr)_6rem] gap-4 md:grid-cols-[1fr_16rem_8rem_auto] md:items-end"
+        role="search"
+      >
+        <Field label={t("parts.search_label")} hint={t("parts.search_hint")} className="max-md:col-span-2">
+          <input enterKeyHint="search" name="q" defaultValue={q} className="field" autoFocus />
         </Field>
         <Field label={t("parts.by_car")}>
           <select name="car" defaultValue={carKey} className="field">
@@ -50,12 +53,12 @@ export default async function PartsPage({ searchParams }: { searchParams: Search
         <Field label={t("parts.year")}>
           <input name="year" defaultValue={year ?? ""} inputMode="numeric" className="field" />
         </Field>
-        <button type="submit" className="button-primary">
+        <button type="submit" className="button-primary max-md:col-span-2">
           {t("form.search")}
         </button>
       </form>
 
-      <section className="card">
+      <section className="card max-md:border-0 max-md:bg-transparent max-md:p-0">
         <p className="mb-3 text-stone-600" data-testid="part-count">
           {hits.length === 0
             ? t("parts.none_found")
@@ -74,6 +77,49 @@ export default async function PartsPage({ searchParams }: { searchParams: Search
               t("parts.garage"),
               t("parts.rack"),
             ]}
+            cards={hits.map((part) => {
+              const out = Number(part.stock) <= 0;
+              return (
+                <RowCard
+                  key={part.id}
+                  href={`/parts/${part.id}`}
+                  title={
+                    <span className={part.is_active ? "" : "text-stone-400"}>
+                      {part.name_bn ?? part.name_en}
+                      {!part.is_active && (
+                        <span className="ml-2 align-middle">
+                          <Badge>{t("parts.inactive")}</Badge>
+                        </span>
+                      )}
+                    </span>
+                  }
+                  amount={taka(BigInt(part.retail_price))}
+                  sub={[part.main_number, part.brand].filter(Boolean).join(" · ")}
+                  side={
+                    <span className={`whitespace-nowrap ${out ? "font-semibold text-red-700" : ""}`}>
+                      {t("parts.stock")} {qty(part.stock)} {t(`value.unit.${part.unit}`)}
+                    </span>
+                  }
+                  extra={
+                    <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-stone-600">
+                      <Badge tone={part.quality === "genuine" ? "brand" : "neutral"}>
+                        {t(`value.quality.${part.quality}`)}
+                      </Badge>
+                      {part.garage_price !== null && (
+                        <span>
+                          {t("parts.garage")} {taka(BigInt(part.garage_price))}
+                        </span>
+                      )}
+                      {part.rack_location && (
+                        <span>
+                          {t("parts.rack")} {part.rack_location}
+                        </span>
+                      )}
+                    </div>
+                  }
+                />
+              );
+            })}
           >
             {hits.map((part) => (
               <tr key={part.id} className={part.is_active ? "" : "text-stone-400"}>

@@ -1,9 +1,9 @@
 import type { Ledger } from "../../src/server/services/party-reads";
 import type { PageContext } from "../../src/web/page-context";
-import { cell, money, Table } from "./ui";
+import { cell, money, RowCard, Table } from "./ui";
 
 // A customer's or supplier's ledger, newest first, with the running balance (GearGrid plan 2.5, 2.7). What is owed going
-// up is brick red, going down green, the same for both (D207).
+// up is brick red, going down green, the same for both (D207). On a phone each line is a card (D243).
 
 export function LedgerTable({
   ledger,
@@ -28,6 +28,26 @@ export function LedgerTable({
           labels.credit,
           labels.balance,
         ]}
+        cards={ledger.lines.map((line) => (
+          <RowCard
+            key={line.id}
+            title={t(`value.ledger.${line.entry_type}`)}
+            amount={
+              line.debit !== "0" ? (
+                <span className="text-red-700">+ {taka(BigInt(line.debit))}</span>
+              ) : (
+                <span className="text-paid">− {taka(BigInt(line.credit))}</span>
+              )
+            }
+            sub={`${date(line.created_at)} · ${line.reference ?? t("form.none")}`}
+            side={
+              <span className="whitespace-nowrap">
+                {labels.balance}{" "}
+                <strong className="text-stone-900">{taka(BigInt(line.balance_after))}</strong>
+              </span>
+            }
+          />
+        ))}
       >
         {ledger.lines.map((line) => (
           <tr key={line.id}>

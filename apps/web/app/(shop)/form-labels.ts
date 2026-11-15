@@ -7,6 +7,8 @@ export const SALE_LABELS = [
   "no_hits",
   "part",
   "qty",
+  "qty_less",
+  "qty_more",
   "price",
   "line_total",
   "list_price",

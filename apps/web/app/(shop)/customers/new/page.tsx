@@ -22,7 +22,7 @@ export default async function NewCustomerPage() {
           </select>
         </Field>
         <Field label={f("phone")} hint={t("form.optional")}>
-          <input name="phone" maxLength={20} inputMode="tel" className="field" />
+          <input name="phone" type="tel" maxLength={20} inputMode="tel" className="field" />
         </Field>
         <Field label={f("creditLimit")} hint={t("customers.limit_blank")}>
           <input name="creditLimit" inputMode="numeric" className="field" />

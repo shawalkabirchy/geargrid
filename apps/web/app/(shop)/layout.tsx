@@ -16,6 +16,15 @@ const GROUPS = [
   { title: "nav.group_shop", keys: ["reports", "review", "import", "audit", "settings"] },
 ] as const;
 
+// The phone's bottom bar (D243, the owner's pick A): the daily work within thumb reach; every page stays in the menu.
+const BAR = [
+  { key: "home", href: "/" },
+  { key: "sales", href: "/sales" },
+  { key: "new_sale", href: "/sales/new" },
+  { key: "parts", href: "/parts" },
+  { key: "customers", href: "/customers" },
+] as const;
+
 const frameButton =
   "inline-flex min-h-10 items-center gap-2 rounded-lg px-3 text-[15px] text-white focus-visible:outline-marigold";
 
@@ -37,6 +46,8 @@ export default async function ShopLayout({ children }: { children: ReactNode }) 
         appName={t("app.name")}
         newSale={t("nav.new_sale")}
         menuLabel={t("nav.menu")}
+        barLabel={t("nav.bar")}
+        bar={BAR.map(({ key, href }) => ({ key, href, label: t(`nav.${key}`) }))}
         groups={groups}
         footer={
           <div className="flex flex-wrap items-center gap-2">
@@ -57,7 +68,8 @@ export default async function ShopLayout({ children }: { children: ReactNode }) 
           </div>
         }
       />
-      <main className="min-w-0 flex-1 px-4 py-6 sm:px-6 lg:px-10 lg:py-8 print:p-0">
+      {/* On a phone the page ends above the bottom bar (D243); from 1024 px it is as before. */}
+      <main className="min-w-0 flex-1 px-4 pt-6 pb-[calc(6.5rem+env(safe-area-inset-bottom))] sm:px-6 lg:px-10 lg:py-8 print:p-0">
         <div className="mx-auto max-w-6xl">{children}</div>
       </main>
     </div>

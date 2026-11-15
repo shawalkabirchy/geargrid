@@ -14,7 +14,7 @@ import {
   removeNumberAction,
 } from "../../catalog-actions";
 import { adjustStockAction } from "../../money-actions";
-import { Badge, cell, Check, Field, money, PageHead, small, SmallLink, Table } from "../../ui";
+import { Badge, cell, Check, Field, money, PageHead, RowCard, small, SmallLink, Table } from "../../ui";
 
 // One part (GearGrid plan 8.1, "Part details"): its record and prices, numbers, shop words, the vehicles it fits and
 // its stock history, with the owner's changes in place.
@@ -81,22 +81,22 @@ export default async function PartPage({ params }: { params: Promise<{ id: strin
           <span className="text-stone-600">{t("parts.stock")}</span>
           <span
             data-testid="part-stock"
-            className={`figure text-3xl font-bold ${Number(part.stock) <= 0 ? "text-red-700" : ""}`}
+            className={`figure text-3xl font-bold max-sm:text-2xl ${Number(part.stock) <= 0 ? "text-red-700" : ""}`}
           >
             {qty(part.stock)} {unit}
           </span>
         </div>
         <div className="flex flex-col gap-1">
           <span className="text-stone-600">{t("fields.rackLocation")}</span>
-          <span className="text-3xl font-bold">{part.rack_location ?? t("form.none")}</span>
+          <span className="text-3xl font-bold max-sm:text-2xl">{part.rack_location ?? t("form.none")}</span>
         </div>
         <div className="flex flex-col gap-1">
           <span className="text-stone-600">{t("fields.retailPrice")}</span>
-          <span className="figure text-3xl font-bold">{taka(BigInt(part.retail_price))}</span>
+          <span className="figure text-3xl font-bold max-sm:text-2xl">{taka(BigInt(part.retail_price))}</span>
         </div>
         <div className="flex flex-col gap-1">
           <span className="text-stone-600">{t("fields.garagePrice")}</span>
-          <span className="figure text-3xl font-bold">
+          <span className="figure text-3xl font-bold max-sm:text-2xl">
             {part.garage_price === null ? t("form.none") : taka(BigInt(part.garage_price))}
           </span>
         </div>
@@ -293,7 +293,7 @@ export default async function PartPage({ params }: { params: Promise<{ id: strin
         </ActionForm>
       </section>
 
-      <section className="card">
+      <section className="card max-md:border-0 max-md:bg-transparent max-md:p-0">
         <h2 className="mb-3 text-lg font-semibold">{t("part.stock_history")}</h2>
         {movements.length === 0 ? (
           <p className="text-stone-600">{t("part.no_movements")}</p>
@@ -301,6 +301,20 @@ export default async function PartPage({ params }: { params: Promise<{ id: strin
           <Table
             right={[3, 4]}
             head={[t("part.date"), t("part.reason"), t("part.bill"), t("part.change"), t("part.unit_cost")]}
+            cards={movements.map((m) => (
+              <RowCard
+                key={m.id}
+                title={t(`value.movement.${m.reason}`)}
+                amount={
+                  <span className={Number(m.qty_change) < 0 ? "text-red-700" : "text-brand-ink"}>
+                    {Number(m.qty_change) > 0 ? "+" : "−"}
+                    {qty(Math.abs(Number(m.qty_change)))}
+                  </span>
+                }
+                sub={`${date(m.created_at)} · ${m.invoice_no ?? t("form.none")}`}
+                side={m.unit_cost === null ? undefined : <span>{taka(BigInt(m.unit_cost))}</span>}
+              />
+            ))}
           >
             {movements.map((m) => (
               <tr key={m.id}>

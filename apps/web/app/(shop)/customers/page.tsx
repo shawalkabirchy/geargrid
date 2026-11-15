@@ -2,9 +2,9 @@ import Link from "next/link";
 import { database } from "../../../src/server/db";
 import { listCustomers } from "../../../src/server/services/party-reads";
 import { pageContext } from "../../../src/web/page-context";
-import { ButtonLink, cell, Field, money, PageHead, Table } from "../ui";
+import { ButtonLink, cell, Field, money, PageHead, RowCard, Table } from "../ui";
 
-// Customers with their dues (GearGrid plan 2.5, 8.1), the biggest due first.
+// Customers with their dues (GearGrid plan 2.5, 8.1), the biggest due first; on a phone as cards (D243).
 
 type Search = Promise<Record<string, string | string[] | undefined>>;
 
@@ -21,13 +21,13 @@ export default async function CustomersPage({ searchParams }: { searchParams: Se
       </PageHead>
       <form className="card mb-4 flex flex-wrap items-end gap-3" role="search">
         <Field label={t("customers.search_label")} className="min-w-64 flex-1">
-          <input name="q" defaultValue={q} className="field" />
+          <input enterKeyHint="search" name="q" defaultValue={q} className="field" />
         </Field>
-        <button type="submit" className="button-primary">
+        <button type="submit" className="button-primary max-md:w-full">
           {t("form.search")}
         </button>
       </form>
-      <section className="card">
+      <section className="card max-md:border-0 max-md:bg-transparent max-md:p-0">
         <p className="mb-2 text-lg">
           {t("customers.total_due")}: <strong data-testid="total-due">{taka(total)}</strong>
         </p>
@@ -43,6 +43,19 @@ export default async function CustomersPage({ searchParams }: { searchParams: Se
               t("customers.credit_limit"),
               t("customers.due"),
             ]}
+            cards={customers.map((c) => (
+              <RowCard
+                key={c.id}
+                href={`/customers/${c.id}`}
+                title={c.name}
+                amount={
+                  <span className={BigInt(c.due_balance) > 0n ? "text-red-700" : "text-stone-500"}>
+                    {taka(BigInt(c.due_balance))}
+                  </span>
+                }
+                sub={[t(`value.customer_type.${c.type}`), c.phone].filter(Boolean).join(" · ")}
+              />
+            ))}
           >
             {customers.map((c) => (
               <tr key={c.id}>

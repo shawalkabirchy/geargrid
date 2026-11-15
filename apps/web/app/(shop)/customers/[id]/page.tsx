@@ -8,7 +8,8 @@ import { LedgerTable } from "../../ledger-table";
 import { editCustomerAction, removeCustomerAction } from "../../party-actions";
 import { METHOD_KEYS } from "../../form-labels";
 import { receivePaymentAction, reversePaymentAction } from "../../trade-actions";
-import { Badge, cell, Field, money, PageHead, small, SmallLink, Table } from "../../ui";
+import { Phone } from "lucide-react";
+import { Badge, cell, Field, money, PageHead, RowCard, small, smallDanger, SmallLink, Table } from "../../ui";
 
 // One customer (GearGrid plan 2.5, 8.1): what they owe, their details and price tier, and the ledger. A customer with
 // nothing in the ledger can be removed (D173).
@@ -43,6 +44,16 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
         </SmallLink>
         <SmallLink href={`/audit?entity=customer&id=${customer.id}`}>{t("audit.history")}</SmallLink>
       </PageHead>
+      {/* On a phone the number calls the customer with one tap (D243). */}
+      {customer.phone && (
+        <a
+          href={`tel:${customer.phone.replace(/[^\d+]/g, "")}`}
+          className="-mt-3 flex min-h-11 w-fit items-center gap-2 font-semibold text-brand-ink md:hidden"
+        >
+          <Phone className="size-[18px]" aria-hidden="true" />
+          {customer.phone}
+        </a>
+      )}
       {/* The khata at a glance (D207): what is owed in large type, and how much of the credit limit it uses. */}
       <section className="card flex flex-wrap items-center gap-x-10 gap-y-4">
         <div className="flex flex-col gap-1">
@@ -111,7 +122,9 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
               <input name="trxId" maxLength={64} className="field" />
             </Field>
             <details className="md:col-span-4">
-              <summary className="cursor-pointer text-stone-600">{t("value.method.cheque")}</summary>
+              <summary className="cursor-pointer text-stone-600 max-md:py-2.5">
+                {t("value.method.cheque")}
+              </summary>
               <div className="mt-2 grid gap-3 md:grid-cols-3">
                 <Field label={t("sale.cheque_bank")}>
                   <input name="chequeBank" className="field" />
@@ -125,7 +138,7 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
               </div>
             </details>
             <div>
-              <button type="submit" className="button-primary">
+              <button type="submit" className="button-primary max-md:w-full">
                 {t("payment.receive")}
               </button>
             </div>
@@ -134,11 +147,58 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
       )}
 
       {payments.length > 0 && (
-        <section className="card">
+        <section className="card max-md:border-0 max-md:bg-transparent max-md:p-0">
           <h2 className="mb-3 text-lg font-semibold">{t("payment.list")}</h2>
           <Table
             right={[1]}
             head={[t("part.date"), t("sale.amount"), t("sale.method"), t("sale.account"), ""]}
+            cards={payments.map((payment) => {
+              const reversed = payment.status === "reversed";
+              return (
+                <RowCard
+                  key={payment.id}
+                  title={
+                    <span className={reversed ? "text-stone-400" : ""}>{page.date(payment.received_at)}</span>
+                  }
+                  amount={
+                    <span className={reversed ? "text-stone-400 line-through" : "text-paid"}>
+                      {taka(BigInt(payment.amount))}
+                    </span>
+                  }
+                  sub={[
+                    t(`value.method.${payment.method}`),
+                    payment.trx_id,
+                    payment.account ?? t("form.none"),
+                  ]
+                    .filter(Boolean)
+                    .join(" · ")}
+                  extra={
+                    reversed ? (
+                      <p className="mt-1 text-sm text-stone-500">
+                        {t("value.payment_status.reversed")}
+                        {payment.reversal_reason ? `: ${payment.reversal_reason}` : ""}
+                      </p>
+                    ) : (
+                      <ActionForm action={reversePaymentAction} className="mt-2 flex gap-2">
+                        <input type="hidden" name="id" value={payment.id} />
+                        <input type="hidden" name="customerId" value={customer.id} />
+                        <input
+                          name="reason"
+                          required
+                          maxLength={200}
+                          placeholder={t("payment.reason")}
+                          aria-label={t("payment.reason")}
+                          className="field mt-0 min-h-11 min-w-0 flex-1 text-base"
+                        />
+                        <button type="submit" className={`${smallDanger} min-h-11 shrink-0`}>
+                          {t("payment.reverse")}
+                        </button>
+                      </ActionForm>
+                    )
+                  }
+                />
+              );
+            })}
           >
             {payments.map((payment) => (
               <tr key={payment.id} className={payment.status === "reversed" ? "text-stone-400" : ""}>
@@ -179,7 +239,7 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
         </section>
       )}
 
-      <section className="card">
+      <section className="card max-md:border-0 max-md:bg-transparent max-md:p-0">
         <h2 className="mb-3 text-lg font-semibold">{t("customers.ledger")}</h2>
         <LedgerTable
           ledger={ledger}
@@ -203,6 +263,7 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
           <Field label={f("phone")}>
             <input
               name="phone"
+              type="tel"
               defaultValue={customer.phone ?? ""}
               maxLength={20}
               inputMode="tel"

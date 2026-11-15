@@ -126,7 +126,7 @@ export function ReturnForm({
             </label>
           </div>
         ))}
-        <button type="button" disabled={pending} onClick={calculate} className="button-primary">
+        <button type="button" disabled={pending} onClick={calculate} className="button-primary max-md:w-full">
           {labels.calc}
         </button>
       </section>
@@ -195,7 +195,7 @@ export function ReturnForm({
               className="field"
             />
           </label>
-          <button type="button" disabled={pending} onClick={save} className="button-primary">
+          <button type="button" disabled={pending} onClick={save} className="button-primary max-md:w-full">
             {labels.save}
           </button>
         </section>

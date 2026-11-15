@@ -8,7 +8,7 @@ import { saleDetail } from "../../../../src/server/services/trade-reads";
 import { pageContext } from "../../../../src/web/page-context";
 import { ActionForm } from "../../action-form";
 import { voidSaleAction } from "../../trade-actions";
-import { Badge, cell, Field, money, Table } from "../../ui";
+import { Badge, cell, Field, money, RowCard, Table } from "../../ui";
 import { PrintButton } from "../../print-button";
 
 // One sale as its bill (GearGrid plan 8.1, appendix "Sample WhatsApp bill"): the shop, the lines, the totals and how it
@@ -57,11 +57,12 @@ export default async function SalePage({ params }: { params: Promise<{ id: strin
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap gap-2 print:hidden">
+      {/* On a phone the WhatsApp button comes first and fills the width; the others share a row (D243). */}
+      <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap print:hidden">
         <PrintButton label={t("sale.print")} />
         <Link
           href={`/audit?entity=sale&id=${sale.id}`}
-          className="inline-flex min-h-12 items-center rounded-lg border border-stone-300 px-3 hover:bg-stone-100"
+          className="inline-flex min-h-12 items-center rounded-lg border border-stone-300 px-3 hover:bg-stone-100 max-sm:justify-center"
         >
           {t("audit.history")}
         </Link>
@@ -69,12 +70,15 @@ export default async function SalePage({ params }: { params: Promise<{ id: strin
           href={whatsapp}
           target="_blank"
           rel="noreferrer"
-          className="button-primary inline-flex items-center"
+          className="button-primary inline-flex items-center max-sm:order-first max-sm:col-span-2 max-sm:min-h-14 max-sm:text-xl"
         >
           {t("sale.whatsapp")}
         </a>
         {!isVoid && returnable && (
-          <Link href={`/sales/${sale.id}/return`} className="button-primary inline-flex items-center">
+          <Link
+            href={`/sales/${sale.id}/return`}
+            className="button-primary inline-flex items-center max-sm:col-span-2"
+          >
             {t("sale.return")}
           </Link>
         )}
@@ -111,7 +115,32 @@ export default async function SalePage({ params }: { params: Promise<{ id: strin
             )}
           </div>
         </div>
-        <Table right={[2, 3]} head={[t("sale.part"), t("sale.qty"), t("sale.price"), t("sale.line_total")]}>
+        <Table
+          right={[2, 3]}
+          head={[t("sale.part"), t("sale.qty"), t("sale.price"), t("sale.line_total")]}
+          cards={items.map((item) => (
+            <RowCard
+              key={item.id}
+              title={item.name_bn ?? item.name_en}
+              amount={taka(BigInt(item.line_total))}
+              sub={
+                <>
+                  {item.number}
+                  {item.returned !== "0" && item.returned !== "0.000" && (
+                    <span className="ml-2 text-amber-700">
+                      {t("sale.returned", { qty: qty(item.returned) })}
+                    </span>
+                  )}
+                </>
+              }
+              side={
+                <span className="whitespace-nowrap tabular-nums">
+                  {qty(item.quantity)} {t(`value.unit.${item.unit}`)} × {taka(BigInt(item.unit_price))}
+                </span>
+              }
+            />
+          ))}
+        >
           {items.map((item) => (
             <tr key={item.id}>
               <td className={cell}>
@@ -195,6 +224,20 @@ export default async function SalePage({ params }: { params: Promise<{ id: strin
               t("return.refund_cash"),
               t("return.reason"),
             ]}
+            cards={returns.map((r) => (
+              <RowCard
+                key={r.id}
+                title={date(r.return_time)}
+                amount={taka(BigInt(r.total))}
+                sub={r.reason ?? t("form.none")}
+                extra={
+                  <p className="mt-1 text-sm text-stone-600">
+                    {t("return.refund_due")}: {taka(BigInt(r.refund_due))} · {t("return.refund_cash")}:{" "}
+                    {taka(BigInt(r.refund_cash))}
+                  </p>
+                }
+              />
+            ))}
           >
             {returns.map((r) => (
               <tr key={r.id}>
@@ -219,7 +262,7 @@ export default async function SalePage({ params }: { params: Promise<{ id: strin
             </Field>
             <button
               type="submit"
-              className="min-h-12 rounded-lg bg-red-700 px-5 text-lg font-semibold text-white"
+              className="min-h-12 rounded-lg bg-red-700 px-5 text-lg font-semibold text-white max-md:w-full"
             >
               {t("sale.void")}
             </button>

@@ -15,7 +15,7 @@ export default async function LoginPage() {
   const { t, settings } = await pageContext();
   return (
     <main className="grid min-h-screen lg:grid-cols-2">
-      <section className="relative flex flex-col justify-between gap-10 overflow-hidden bg-frame px-6 py-8 text-white sm:px-12 lg:py-14">
+      <section className="relative flex flex-col justify-between gap-10 overflow-hidden bg-frame px-6 py-8 text-white max-lg:pt-[calc(2rem+env(safe-area-inset-top))] sm:px-12 lg:py-14">
         <div className="flex items-center gap-3">
           <Mark />
           <span className="text-lg font-semibold">{t("app.name")}</span>

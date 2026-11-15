@@ -1,14 +1,14 @@
 "use client";
 
 import { lineValue, saleTotals, type RoundOffStep, type SaleTotals } from "@geargrid/core";
-import { Trash2 } from "lucide-react";
-import { useMemo, useState, useTransition } from "react";
+import { Minus, Plus, Trash2 } from "lucide-react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import type { AccountOption } from "../../../src/server/services/trade-reads";
 import { digitsText, quantityMilli, takaText, typedNumber, type Labels } from "../client-format";
 import { PartPicker } from "../part-picker";
 import { emptyPayment, PaymentRows, paymentsPayload, type PaymentRow } from "../payment-rows";
 import { saveSaleAction, type PartChoice } from "../trade-actions";
-import { Badge } from "../ui";
+import { Badge, PhoneSaveBar } from "../ui";
 
 // The new-sale screen (GearGrid plan 8.1, 8.3): pick the customer (walk-in by default), add parts, change a price or
 // a quantity, a discount in taka or percent, the round-off, and how it is paid; whatever is not paid is the
@@ -52,6 +52,14 @@ export function SaleForm({
   const [warnings, setWarnings] = useState<string[]>([]);
   const [error, setError] = useState("");
   const [pending, startTransition] = useTransition();
+  const alerts = useRef<HTMLDivElement>(null);
+
+  // On a phone Save sits in the bar at the bottom, far from the warnings (D243): bring them into view.
+  useEffect(() => {
+    if ((warnings.length > 0 || error) && window.matchMedia("(max-width: 1023px)").matches) {
+      alerts.current?.scrollIntoView({ block: "center", behavior: "smooth" });
+    }
+  }, [warnings, error]);
 
   const customer = customers.find((c) => c.id === customerId) ?? null;
   const tier = customer?.price_tier ?? "retail";
@@ -117,6 +125,15 @@ export function SaleForm({
       const listPrice = listPriceFor(part, tier);
       return [...current, { part, qty: "1", price: String(listPrice), listPrice }];
     });
+  }
+
+  /** The phone's − and + beside a quantity: one less (never below one) or one more. */
+  function step(index: number, by: 1 | -1) {
+    setLines(
+      lines.map((line, i) =>
+        i === index ? { ...line, qty: String(Math.max(1, (typedNumber(line.qty) || 0) + by)) } : line,
+      ),
+    );
   }
 
   function payload() {
@@ -190,13 +207,16 @@ export function SaleForm({
           <PartPicker labels={labels} banglaDigits={banglaDigits} onPick={addPart} />
         </section>
 
-        <section className="card">
+        {/* On a phone each line is its own card, with − and + beside the quantity (D243); the same fields, once. */}
+        <section
+          className={`card ${lines.length > 0 ? "max-md:border-0 max-md:bg-transparent max-md:p-0" : ""}`}
+        >
           {lines.length === 0 ? (
             <p className="text-stone-600">{labels.empty_cart}</p>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left" data-testid="cart">
-                <thead>
+            <div className="overflow-x-auto max-md:overflow-visible">
+              <table className="w-full text-left max-md:block" data-testid="cart">
+                <thead className="max-md:hidden">
                   <tr className="border-b-[1.5px] border-stone-200 text-sm text-stone-600">
                     <th className="min-w-48 px-2 py-2.5 font-medium">{labels.part}</th>
                     <th className="px-2 py-2.5 font-medium">{labels.qty}</th>
@@ -205,15 +225,18 @@ export function SaleForm({
                     <th />
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="max-md:flex max-md:flex-col max-md:gap-3">
                   {lines.map((line, index) => {
                     const milli = quantityMilli(line.qty);
                     const price = Math.round(typedNumber(line.price) || 0);
                     const lineTotal = milli === null ? null : lineValue(milli, BigInt(price));
                     const stockAfter = Number(line.part.stock) - typedNumber(line.qty);
                     return (
-                      <tr key={line.part.id} className="border-t border-stone-200 align-top">
-                        <td className="px-2 py-3">
+                      <tr
+                        key={line.part.id}
+                        className="border-t border-stone-200 align-top max-md:grid max-md:grid-cols-[auto_minmax(0,1fr)_auto] max-md:items-end max-md:gap-x-2.5 max-md:gap-y-2 max-md:rounded-2xl max-md:border max-md:bg-white max-md:p-3.5"
+                      >
+                        <td className="px-2 py-3 max-md:col-span-2 max-md:row-start-1 max-md:self-start max-md:p-0">
                           <div className="font-semibold">{line.part.name}</div>
                           <div
                             className={`flex flex-wrap gap-x-3 text-sm ${stockAfter < 0 ? "text-red-700" : "text-stone-600"}`}
@@ -228,20 +251,42 @@ export function SaleForm({
                             </span>
                           </div>
                         </td>
-                        <td className="px-2 py-3">
-                          <input
-                            value={line.qty}
-                            onChange={(event) =>
-                              setLines(
-                                lines.map((l, i) => (i === index ? { ...l, qty: event.target.value } : l)),
-                              )
-                            }
-                            inputMode="decimal"
-                            className={`field mt-0 w-24 ${milli === null ? "border-red-500" : ""}`}
-                            aria-label={labels.qty}
-                          />
+                        <td className="px-2 py-3 max-md:col-start-1 max-md:row-start-2 max-md:p-0">
+                          <span className="mb-0.5 block text-sm text-stone-600 md:hidden">{labels.qty}</span>
+                          <div className="flex max-md:overflow-hidden max-md:rounded-xl max-md:border-[1.5px] max-md:border-stone-300">
+                            <button
+                              type="button"
+                              onClick={() => step(index, -1)}
+                              className="inline-flex w-11 shrink-0 items-center justify-center bg-stone-100 text-brand-ink md:hidden"
+                              aria-label={labels.qty_less}
+                            >
+                              <Minus className="size-5" strokeWidth={2.4} aria-hidden="true" />
+                            </button>
+                            <input
+                              value={line.qty}
+                              onChange={(event) =>
+                                setLines(
+                                  lines.map((l, i) => (i === index ? { ...l, qty: event.target.value } : l)),
+                                )
+                              }
+                              inputMode="decimal"
+                              className={`field mt-0 w-24 max-md:min-h-11 max-md:w-12 max-md:rounded-none max-md:border-0 max-md:px-1 max-md:text-center max-md:font-semibold ${milli === null ? "border-red-500 max-md:bg-red-50" : ""}`}
+                              aria-label={labels.qty}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => step(index, 1)}
+                              className="inline-flex w-11 shrink-0 items-center justify-center bg-stone-100 text-brand-ink md:hidden"
+                              aria-label={labels.qty_more}
+                            >
+                              <Plus className="size-5" strokeWidth={2.4} aria-hidden="true" />
+                            </button>
+                          </div>
                         </td>
-                        <td className="px-2 py-3">
+                        <td className="px-2 py-3 max-md:col-start-2 max-md:row-start-2 max-md:p-0">
+                          <span className="mb-0.5 block text-sm text-stone-600 md:hidden">
+                            {labels.price}
+                          </span>
                           <input
                             value={line.price}
                             onChange={(event) =>
@@ -250,7 +295,7 @@ export function SaleForm({
                               )
                             }
                             inputMode="numeric"
-                            className="field mt-0 w-32"
+                            className="field mt-0 w-32 max-md:min-h-12 max-md:w-full max-md:text-right"
                             aria-label={labels.price}
                           />
                           {BigInt(price) !== line.listPrice && (
@@ -259,14 +304,18 @@ export function SaleForm({
                             </div>
                           )}
                         </td>
-                        <td className="px-2 py-3 pt-5 text-right font-semibold whitespace-nowrap tabular-nums">
+                        {/* On a narrow phone (under 380 px) the line's total takes a row of its own. */}
+                        <td className="px-2 py-3 pt-5 text-right font-semibold whitespace-nowrap tabular-nums max-md:p-0 max-md:text-lg max-[379px]:col-span-3 max-[379px]:row-start-3 min-[380px]:max-md:col-start-3 min-[380px]:max-md:row-start-2 min-[380px]:max-md:leading-[3rem]">
+                          <span className="mr-2 hidden text-sm font-normal text-stone-600 max-[379px]:inline">
+                            {labels.line_total}
+                          </span>
                           {lineTotal === null ? "—" : taka(lineTotal)}
                         </td>
-                        <td className="px-2 py-3 text-right">
+                        <td className="px-2 py-3 text-right max-md:col-start-3 max-md:row-start-1 max-md:-mt-1.5 max-md:-mr-1.5 max-md:self-start max-md:p-0">
                           <button
                             type="button"
                             onClick={() => setLines(lines.filter((_, i) => i !== index))}
-                            className="inline-flex size-12 items-center justify-center rounded-xl text-stone-600 hover:bg-red-50 hover:text-red-700"
+                            className="inline-flex size-12 items-center justify-center rounded-xl text-stone-600 hover:bg-red-50 hover:text-red-700 max-md:size-11"
                             aria-label={labels.remove}
                           >
                             <Trash2 className="size-5" aria-hidden="true" />
@@ -356,33 +405,55 @@ export function SaleForm({
           </dd>
         </dl>
 
-        {warnings.length > 0 && (
-          <section role="alert" className="rounded-xl border-[1.5px] border-amber-400 bg-amber-50 p-4">
-            <p className="mb-2 font-semibold text-amber-900">{labels.warnings}</p>
-            <ul className="mb-3 list-disc pl-6">
-              {warnings.map((text) => (
-                <li key={text}>{text}</li>
-              ))}
-            </ul>
-            <button type="button" disabled={pending} onClick={() => save(true)} className="button-primary">
-              {labels.save_anyway}
-            </button>
-          </section>
-        )}
-        {error && (
-          <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-lg text-red-700">
-            {error}
-          </p>
-        )}
+        <div ref={alerts} className="space-y-5 empty:hidden">
+          {warnings.length > 0 && (
+            <section role="alert" className="rounded-xl border-[1.5px] border-amber-400 bg-amber-50 p-4">
+              <p className="mb-2 font-semibold text-amber-900">{labels.warnings}</p>
+              <ul className="mb-3 list-disc pl-6">
+                {warnings.map((text) => (
+                  <li key={text}>{text}</li>
+                ))}
+              </ul>
+              <button type="button" disabled={pending} onClick={() => save(true)} className="button-primary">
+                {labels.save_anyway}
+              </button>
+            </section>
+          )}
+          {error && (
+            <p role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-lg text-red-700">
+              {error}
+            </p>
+          )}
+        </div>
+        {/* Save is here from 1024 px; on a phone it is in the bar at the bottom (D243), so it exists once on screen. */}
         <button
           type="button"
           disabled={pending || totals === null}
           onClick={() => save(false)}
-          className="button-main w-full text-xl"
+          className="button-main w-full text-xl max-lg:hidden"
         >
           {labels.save}
         </button>
       </aside>
+
+      <PhoneSaveBar
+        label={labels.total}
+        total={totals ? taka(totals.total) : "—"}
+        detail={
+          <>
+            <span className="text-paid">
+              {labels.paid} {taka(paid)}
+            </span>
+            <span aria-hidden="true"> · </span>
+            <span className={due > 0n ? "font-semibold text-red-700" : "text-stone-600"}>
+              {labels.due} {taka(due)}
+            </span>
+          </>
+        }
+        save={labels.save}
+        onSave={() => save(false)}
+        disabled={pending || totals === null}
+      />
     </div>
   );
 }
