@@ -5,7 +5,7 @@ import { purchaseDetail } from "../../../../src/server/services/trade-reads";
 import { pageContext } from "../../../../src/web/page-context";
 import { ActionForm } from "../../action-form";
 import { reversePurchaseAction } from "../../trade-actions";
-import { Badge, cell, Field, money, PageHead, Table } from "../../ui";
+import { Badge, cell, Field, money, PageHead, RowCard, Table } from "../../ui";
 
 // One purchase: the supplier, its lines and payments, and the reversal (spec 6.5, D93).
 
@@ -41,6 +41,19 @@ export default async function PurchasePage({ params }: { params: Promise<{ id: s
         <Table
           right={[2, 3]}
           head={[t("sale.part"), t("sale.qty"), t("purchase.unit_cost"), t("sale.line_total")]}
+          cards={items.map((item) => (
+            <RowCard
+              key={item.id}
+              href={`/parts/${item.part_id}`}
+              title={item.name_bn ?? item.name_en}
+              amount={taka(BigInt(item.line_total))}
+              side={
+                <span className="whitespace-nowrap tabular-nums">
+                  {qty(item.quantity)} {t(`value.unit.${item.unit}`)} × {taka(BigInt(item.unit_cost))}
+                </span>
+              }
+            />
+          ))}
         >
           {items.map((item) => (
             <tr key={item.id}>
@@ -88,7 +101,7 @@ export default async function PurchasePage({ params }: { params: Promise<{ id: s
             </Field>
             <button
               type="submit"
-              className="min-h-12 rounded-lg bg-red-700 px-5 text-lg font-semibold text-white"
+              className="min-h-12 rounded-lg bg-red-700 px-5 text-lg font-semibold text-white max-md:w-full"
             >
               {t("purchase.reverse")}
             </button>

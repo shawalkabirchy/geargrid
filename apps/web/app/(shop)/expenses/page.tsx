@@ -4,10 +4,10 @@ import { allAccounts, expenseCategoryOptions, listExpenses } from "../../../src/
 import { pageContext } from "../../../src/web/page-context";
 import { ActionForm } from "../action-form";
 import { addCategoryAction, addDefaultCategoriesAction, addExpenseAction } from "../money-actions";
-import { cell, Field, money, PageHead, Table } from "../ui";
+import { cell, Field, money, PageHead, RowCard, Table } from "../ui";
 
 // Expenses (GearGrid plan 2.8): rent, electricity, transport, labour, tea and snacks and others, each paid from an
-// account; the list of a range of days (this month by default) with its total.
+// account; the list of a range of days (this month by default) with its total. On a phone the list is cards (D243).
 
 type Search = Promise<Record<string, string | string[] | undefined>>;
 
@@ -86,26 +86,38 @@ export default async function ExpensesPage({ searchParams }: { searchParams: Sea
         )}
       </section>
 
-      <form className="card grid gap-3 md:grid-cols-[10rem_10rem_auto] md:items-end">
+      <form className="card grid grid-cols-2 gap-3 md:grid-cols-[10rem_10rem_auto] md:items-end">
         <Field label={t("sale.from")}>
           <input type="date" name="from" defaultValue={from} className="field" />
         </Field>
         <Field label={t("sale.to")}>
           <input type="date" name="to" defaultValue={to} className="field" />
         </Field>
-        <button type="submit" className="button-primary">
+        <button type="submit" className="button-primary max-md:col-span-2">
           {t("form.search")}
         </button>
       </form>
 
-      <section className="card">
+      <section className="card max-md:border-0 max-md:bg-transparent max-md:p-0">
         <p className="mb-2 text-lg">
           {t("expenses.total")}: <strong data-testid="expense-total">{taka(total)}</strong>
         </p>
         {rows.length === 0 ? (
           <p className="text-stone-600">{t("expenses.none")}</p>
         ) : (
-          <Table right={[4]} head={[f("date"), f("categoryId"), f("accountId"), f("note"), f("amount")]}>
+          <Table
+            right={[4]}
+            head={[f("date"), f("categoryId"), f("accountId"), f("note"), f("amount")]}
+            cards={rows.map((row) => (
+              <RowCard
+                key={row.id}
+                title={name(row.category, row.category_bn)}
+                amount={taka(BigInt(row.amount))}
+                sub={`${date(row.spent_at)} · ${row.account}`}
+                side={row.note ? <span>{row.note}</span> : undefined}
+              />
+            ))}
+          >
             {rows.map((row) => (
               <tr key={row.id}>
                 <td className={cell}>{date(row.spent_at)}</td>
@@ -122,7 +134,11 @@ export default async function ExpensesPage({ searchParams }: { searchParams: Sea
       {categories.length > 0 && (
         <section className="card">
           <h2 className="mb-3 text-lg font-semibold">{t("expenses.add_category")}</h2>
-          <ActionForm action={addCategoryAction} reset className="flex flex-wrap items-end gap-3">
+          <ActionForm
+            action={addCategoryAction}
+            reset
+            className="flex flex-wrap items-end gap-3 max-md:flex-col max-md:items-stretch"
+          >
             <Field label={f("nameEn")}>
               <input name="nameEn" required maxLength={60} className="field" />
             </Field>

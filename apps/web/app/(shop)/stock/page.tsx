@@ -2,7 +2,7 @@ import Link from "next/link";
 import { database } from "../../../src/server/db";
 import { deadStock, lowStock, stockValue, type StockRow } from "../../../src/server/services/stock";
 import { pageContext } from "../../../src/web/page-context";
-import { ButtonLink, cell, money, PageHead, Table } from "../ui";
+import { ButtonLink, cell, money, PageHead, RowCard, Table } from "../ui";
 
 // Stock (GearGrid plan 2.7, 8.1): the stock value at average cost, the low-stock list (at or below the reorder level)
 // and the dead-stock list (no sale in 90 days). A part's own stock is adjusted on its page; a rack is counted on
@@ -27,12 +27,32 @@ export default async function StockPage() {
         <span className="text-stone-500">{t("stock.value_parts", { count: value.parts })}</span>
       </section>
 
-      <section className="card">
+      <section className="card max-md:border-0 max-md:bg-transparent max-md:p-0">
         <h2 className="mb-3 text-lg font-semibold">{t("stock.low")}</h2>
         {low.length === 0 ? (
           <p className="text-stone-600">{t("stock.none_low")}</p>
         ) : (
-          <Table head={[t("parts.part"), t("parts.rack"), t("parts.stock"), t("stock.reorder")]}>
+          <Table
+            head={[t("parts.part"), t("parts.rack"), t("parts.stock"), t("stock.reorder")]}
+            cards={low.map((row) => (
+              <RowCard
+                key={row.id}
+                href={`/parts/${row.id}`}
+                title={row.name_bn ?? row.name_en}
+                amount={
+                  <span className={Number(row.stock) <= 0 ? "text-red-700" : ""}>
+                    {qty(row.stock)} {t(`value.unit.${row.unit}`)}
+                  </span>
+                }
+                sub={[row.number, row.rack_location].filter(Boolean).join(" · ")}
+                side={
+                  <span className="whitespace-nowrap">
+                    {t("stock.reorder")} {qty(row.reorder_level)}
+                  </span>
+                }
+              />
+            ))}
+          >
             {low.map((row) => (
               <tr key={row.id} data-testid="low-row">
                 <td className={cell}>
@@ -50,7 +70,7 @@ export default async function StockPage() {
         )}
       </section>
 
-      <section className="card">
+      <section className="card max-md:border-0 max-md:bg-transparent max-md:p-0">
         <h2 className="mb-3 text-lg font-semibold">{t("stock.dead")}</h2>
         {dead.length === 0 ? (
           <p className="text-stone-600">{t("stock.none_dead")}</p>
@@ -58,6 +78,20 @@ export default async function StockPage() {
           <Table
             right={[2]}
             head={[t("parts.part"), t("parts.stock"), t("stock.worth"), t("stock.last_sale")]}
+            cards={dead.map((row) => (
+              <RowCard
+                key={row.id}
+                href={`/parts/${row.id}`}
+                title={row.name_bn ?? row.name_en}
+                amount={taka(BigInt(Math.round(Number(row.stock) * Number(row.avg_cost))))}
+                sub={`${qty(row.stock)} ${t(`value.unit.${row.unit}`)}`}
+                side={
+                  <span className="whitespace-nowrap">
+                    {t("stock.last_sale")}: {row.last_sale ? date(row.last_sale) : t("stock.never")}
+                  </span>
+                }
+              />
+            ))}
           >
             {dead.map((row) => (
               <tr key={row.id}>

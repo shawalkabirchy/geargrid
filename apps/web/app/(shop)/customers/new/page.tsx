@@ -31,7 +31,7 @@ export default async function NewCustomerPage() {
           <input name="address" maxLength={300} className="field" />
         </Field>
         <div>
-          <button type="submit" className="button-primary">
+          <button type="submit" className="button-primary max-md:w-full">
             {t("common.save")}
           </button>
         </div>

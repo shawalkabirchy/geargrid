@@ -3,7 +3,7 @@ import { rackParts, racks } from "../../../../src/server/services/stock";
 import { pageContext } from "../../../../src/web/page-context";
 import { ActionForm } from "../../action-form";
 import { countStockAction } from "../../money-actions";
-import { cell, Field, PageHead, Table } from "../../ui";
+import { cell, Field, PageHead, stackCell, stackRow, Table } from "../../ui";
 
 // Count by rack (GearGrid plan 2.7): pick a rack, type what is on it; each difference from the books becomes a
 // "count" adjustment.
@@ -20,7 +20,7 @@ export default async function CountPage({ searchParams }: { searchParams: Search
   return (
     <div className="space-y-6">
       <PageHead title={t("stock.count")} />
-      <form className="card flex flex-wrap items-end gap-3">
+      <form className="card flex flex-wrap items-end gap-3 max-md:flex-col max-md:items-stretch">
         <Field label={t("stock.pick_rack")}>
           <select name="rack" defaultValue={rack} className="field">
             <option value="" disabled>
@@ -40,29 +40,30 @@ export default async function CountPage({ searchParams }: { searchParams: Search
       {rows.length > 0 && (
         <ActionForm action={countStockAction} className="card space-y-4">
           <p className="text-stone-600">{t("stock.count_hint")}</p>
-          <Table head={[t("parts.part"), t("stock.in_books"), t("fields.counted")]}>
+          <Table head={[t("parts.part"), t("stock.in_books"), t("fields.counted")]} stacked>
             {rows.map((row) => (
-              <tr key={row.id}>
-                <td className={cell}>
+              <tr key={row.id} className={stackRow}>
+                <td className={`${cell} ${stackCell} max-md:col-span-2`}>
                   {row.name_bn ?? row.name_en}
                   <div className="text-sm text-stone-500">{row.number}</div>
                   <input type="hidden" name="partId" value={row.id} />
                 </td>
-                <td className={`${cell} tabular-nums`}>
+                <td className={`${cell} ${stackCell} tabular-nums`}>
+                  <span className="text-stone-600 md:hidden">{t("stock.in_books")}: </span>
                   {qty(row.stock)} {t(`value.unit.${row.unit}`)}
                 </td>
-                <td className={cell}>
+                <td className={`${cell} ${stackCell}`}>
                   <input
                     name={`counted:${row.id}`}
                     inputMode="decimal"
                     aria-label={`${t("fields.counted")} ${row.name_en}`}
-                    className="field w-32"
+                    className="field w-32 max-md:w-28"
                   />
                 </td>
               </tr>
             ))}
           </Table>
-          <button type="submit" className="button-primary">
+          <button type="submit" className="button-primary max-md:w-full">
             {t("stock.save_count")}
           </button>
         </ActionForm>

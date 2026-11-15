@@ -145,7 +145,7 @@ export async function PartForm({ part }: { part?: PartDetail["part"] }) {
         <Check name="isActive" label={f("isActive")} defaultChecked={part?.is_active ?? true} />
       </section>
       {!part && <p className="text-stone-600">{t("part.no_stock_hint")}</p>}
-      <button type="submit" className="button-primary">
+      <button type="submit" className="button-primary max-md:w-full">
         {t("common.save")}
       </button>
     </ActionForm>

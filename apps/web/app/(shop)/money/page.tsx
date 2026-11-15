@@ -5,10 +5,10 @@ import { allAccounts } from "../../../src/server/services/money";
 import { pageContext } from "../../../src/web/page-context";
 import { ActionForm } from "../action-form";
 import { addAccountAction, transferAction } from "../money-actions";
-import { cell, Field, money, PageHead, Table } from "../ui";
+import { cell, Field, money, PageHead, RowCard, Table } from "../ui";
 
 // Money (GearGrid plan 2.8, 8.1): every account with its balance and cash book, a transfer between two accounts
-// (cash into the bank, a bKash cash-out) and a new account.
+// (cash into the bank, a bKash cash-out) and a new account. On a phone the accounts are cards (D243).
 
 export default async function MoneyPage() {
   const { t, taka } = await pageContext();
@@ -24,9 +24,36 @@ export default async function MoneyPage() {
   return (
     <div className="space-y-6">
       <PageHead title={t("money.title")} />
-      <section className="card">
+      <section className="card max-md:border-0 max-md:bg-transparent max-md:p-0">
         <h2 className="mb-3 text-lg font-semibold">{t("money.accounts")}</h2>
-        <Table right={[3]} head={[f("name"), f("kind"), f("accountNumber"), t("money.balance"), ""]}>
+        <Table
+          right={[3]}
+          head={[f("name"), f("kind"), f("accountNumber"), t("money.balance"), ""]}
+          cards={[
+            ...accounts.map((a) => (
+              <RowCard
+                key={a.id}
+                href={`/money/${a.id}`}
+                title={
+                  <span className={a.is_active ? "" : "text-stone-400"}>
+                    {a.name}
+                    {!a.is_active && (
+                      <span className="ml-2 text-sm font-normal">({t("money.inactive")})</span>
+                    )}
+                  </span>
+                }
+                amount={
+                  <span className={BigInt(a.balance) < 0n ? "text-red-700" : ""}>
+                    {taka(BigInt(a.balance))}
+                  </span>
+                }
+                sub={[t(`account_kind.${a.kind}`), a.number].filter(Boolean).join(" · ")}
+                side={<span className="text-brand-ink">{t("money.open_cash_book")}</span>}
+              />
+            )),
+            <RowCard key="total" title={t("money.total")} amount={taka(total)} />,
+          ]}
+        >
           {accounts.map((a) => (
             <tr key={a.id} className={a.is_active ? "" : "text-stone-400"}>
               <td className={`${cell} font-medium`}>

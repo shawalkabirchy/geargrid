@@ -4,7 +4,7 @@ import { listVehicles } from "../../../src/server/services/catalog-reads";
 import { pageContext } from "../../../src/web/page-context";
 import { ActionForm } from "../action-form";
 import { addVehicleAction } from "../catalog-actions";
-import { cell, Field, PageHead, Table } from "../ui";
+import { cell, Field, PageHead, RowCard, Table } from "../ui";
 
 // The vehicle list (GearGrid plan 2.2): the starter models and those the shop adds, with how many parts fit each.
 
@@ -50,8 +50,27 @@ export default async function VehiclesPage() {
           </button>
         </ActionForm>
       </section>
-      <section className="card">
+      <section className="card max-md:border-0 max-md:bg-transparent max-md:p-0">
         <Table
+          cards={vehicles.map((v) => (
+            <RowCard
+              key={v.id}
+              title={`${v.make} ${v.model}`}
+              amount={
+                <span className="font-normal text-stone-600">
+                  {t("vehicles.parts")} {digits(v.parts)}
+                </span>
+              }
+              sub={[
+                `${digits(v.year_from)}–${v.year_to === null ? t("vehicles.still_made") : digits(v.year_to)}`,
+                v.engine_code,
+                t(`value.vehicle_type.${v.vehicle_type}`),
+              ]
+                .filter(Boolean)
+                .join(" · ")}
+              side={<span>{t(`value.vehicle_source.${v.source}`)}</span>}
+            />
+          ))}
           head={[
             f("make"),
             f("model"),

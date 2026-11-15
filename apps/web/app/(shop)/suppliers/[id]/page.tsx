@@ -68,7 +68,9 @@ export default async function SupplierPage({ params }: { params: Promise<{ id: s
               <input name="trxId" maxLength={64} className="field" />
             </Field>
             <details className="md:col-span-4">
-              <summary className="cursor-pointer text-stone-600">{t("value.method.cheque")}</summary>
+              <summary className="cursor-pointer text-stone-600 max-md:py-2.5">
+                {t("value.method.cheque")}
+              </summary>
               <div className="mt-2 grid gap-3 md:grid-cols-3">
                 <Field label={t("sale.cheque_bank")}>
                   <input name="chequeBank" className="field" />
@@ -82,7 +84,7 @@ export default async function SupplierPage({ params }: { params: Promise<{ id: s
               </div>
             </details>
             <div>
-              <button type="submit" className="button-primary">
+              <button type="submit" className="button-primary max-md:w-full">
                 {t("supplier_pay.title")}
               </button>
             </div>
@@ -90,7 +92,7 @@ export default async function SupplierPage({ params }: { params: Promise<{ id: s
         </section>
       )}
 
-      <section className="card">
+      <section className="card max-md:border-0 max-md:bg-transparent max-md:p-0">
         <h2 className="mb-3 text-lg font-semibold">{t("suppliers.ledger")}</h2>
         <LedgerTable
           ledger={ledger}
@@ -114,6 +116,7 @@ export default async function SupplierPage({ params }: { params: Promise<{ id: s
           <Field label={f("phone")}>
             <input
               name="phone"
+              type="tel"
               defaultValue={supplier.phone ?? ""}
               maxLength={20}
               inputMode="tel"
@@ -124,7 +127,7 @@ export default async function SupplierPage({ params }: { params: Promise<{ id: s
             <input name="address" defaultValue={supplier.address ?? ""} maxLength={300} className="field" />
           </Field>
           <div>
-            <button type="submit" className="button-primary">
+            <button type="submit" className="button-primary max-md:w-full">
               {t("common.save")}
             </button>
           </div>

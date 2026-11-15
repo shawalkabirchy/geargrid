@@ -5,11 +5,11 @@ import { allAccounts, cashBook, closings } from "../../../../src/server/services
 import { pageContext } from "../../../../src/web/page-context";
 import { ActionForm } from "../../action-form";
 import { closeDayAction, editAccountAction } from "../../money-actions";
-import { cell, Check, Field, money, PageHead, SmallLink, Table } from "../../ui";
+import { cell, Check, Field, money, PageHead, SmallLink, RowCard, Table } from "../../ui";
 
 // One account's cash book (GearGrid plan 2.8): the opening balance, every movement in and out, the closing balance
 // for a range of days (today by default); the daily closing, where the owner enters the counted money; and the
-// account's name, number and whether it is in use.
+// account's name, number and whether it is in use. On a phone the lines are cards (D243).
 
 type Search = Promise<Record<string, string | string[] | undefined>>;
 
@@ -44,19 +44,19 @@ export default async function CashBookPage({
           {t("reports.excel")} / {t("reports.pdf")}
         </SmallLink>
       </PageHead>
-      <form className="card grid gap-3 md:grid-cols-[10rem_10rem_auto] md:items-end">
+      <form className="card grid grid-cols-2 gap-3 md:grid-cols-[10rem_10rem_auto] md:items-end">
         <Field label={t("sale.from")}>
           <input type="date" name="from" defaultValue={from} className="field" />
         </Field>
         <Field label={t("sale.to")}>
           <input type="date" name="to" defaultValue={to} className="field" />
         </Field>
-        <button type="submit" className="button-primary">
+        <button type="submit" className="button-primary max-md:col-span-2">
           {t("form.search")}
         </button>
       </form>
 
-      <section className="card">
+      <section className="card max-md:border-0 max-md:bg-transparent max-md:p-0">
         <p className="mb-3 flex flex-wrap gap-x-8 text-lg" data-testid="cash-book-summary">
           <span>
             {t("money.opening")}: {taka(book.opening)}
@@ -83,6 +83,25 @@ export default async function CashBookPage({
               t("money.money_in"),
               t("money.money_out"),
             ]}
+            cards={book.lines.map((line) => (
+              <RowCard
+                key={line.id}
+                title={
+                  <>
+                    {t(`value.ref.${line.ref_type}`, { defaultValue: line.ref_type })}
+                    {line.note && <span className="text-sm font-normal text-stone-500"> · {line.note}</span>}
+                  </>
+                }
+                amount={
+                  line.direction === "in" ? (
+                    <span className="text-brand-ink">+ {taka(BigInt(line.amount))}</span>
+                  ) : (
+                    <span className="text-red-700">− {taka(BigInt(line.amount))}</span>
+                  )
+                }
+                sub={`${date(line.created_at)} ${time(line.created_at)} · ${line.reference ?? t("form.none")}`}
+              />
+            ))}
           >
             {book.lines.map((line) => (
               <tr key={line.id}>
@@ -127,6 +146,18 @@ export default async function CashBookPage({
               <Table
                 right={[1, 2, 3]}
                 head={[f("date"), t("money.expected"), f("counted"), t("money.difference")]}
+                cards={past.map((row) => (
+                  <RowCard
+                    key={row.id}
+                    title={date(row.date)}
+                    amount={
+                      <span className={row.difference === "0" ? "" : "text-red-700"}>
+                        {taka(BigInt(row.difference))}
+                      </span>
+                    }
+                    sub={`${t("money.expected")} ${taka(BigInt(row.expected_balance))} · ${f("counted")} ${taka(BigInt(row.counted_balance))}`}
+                  />
+                ))}
               >
                 {past.map((row) => (
                   <tr key={row.id}>

@@ -89,24 +89,31 @@ export function ButtonLink({
 /**
  * A table; the columns named in `right` (money, counts) are right-aligned, their headings too. With `cards`, a phone
  * (below 768 px) shows those cards instead and the table stays from 768 px up (D243). The cards are a second copy for
- * the eye, never a form: a form's fields exist once.
+ * the eye, never a form: a form's fields exist once. A table that holds a form's fields is `stacked` instead: below
+ * 768 px its head hides and each row, given `stackRow`, becomes a card itself, its cells given `stackCell`.
  */
 export function Table({
   head,
   right = [],
   cards,
+  stacked = false,
   children,
 }: {
   head: ReactNode[];
   right?: number[];
   cards?: ReactNode;
+  stacked?: boolean;
   children: ReactNode;
 }) {
   const table = (
-    <div className={`overflow-x-auto ${cards ? "hidden md:block" : ""}`}>
+    <div
+      className={`overflow-x-auto ${cards ? "hidden md:block" : ""} ${stacked ? "max-md:overflow-visible" : ""}`}
+    >
       {/* At least 36rem wide: on a phone the table scrolls inside its card instead of crushing its columns. */}
-      <table className="w-full min-w-[36rem] text-left [&_tbody_tr:hover]:bg-stone-50">
-        <thead>
+      <table
+        className={`w-full min-w-[36rem] text-left [&_tbody_tr:hover]:bg-stone-50 ${stacked ? "max-md:block max-md:min-w-0" : ""}`}
+      >
+        <thead className={stacked ? "max-md:hidden" : undefined}>
           <tr className="border-b-[1.5px] border-stone-200 text-sm text-stone-600">
             {head.map((label, index) => (
               <th
@@ -118,7 +125,7 @@ export function Table({
             ))}
           </tr>
         </thead>
-        <tbody>{children}</tbody>
+        <tbody className={stacked ? "max-md:flex max-md:flex-col max-md:gap-3" : undefined}>{children}</tbody>
       </table>
     </div>
   );
@@ -273,6 +280,11 @@ export function SmallLink({ href, children }: { href: string; children: ReactNod
 }
 
 export const cell = "border-t border-stone-200 px-3 py-3";
+/** A row of a `stacked` table on a phone: a card of two columns (D243). */
+export const stackRow =
+  "max-md:grid max-md:grid-cols-[minmax(0,1fr)_auto] max-md:items-center max-md:gap-x-3 max-md:gap-y-1 max-md:rounded-2xl max-md:border max-md:border-stone-200 max-md:bg-white max-md:p-3.5";
+/** A cell of a `stacked` table on a phone: no border or padding of its own. */
+export const stackCell = "max-md:border-0 max-md:p-0";
 export const money = `${cell} text-right tabular-nums whitespace-nowrap`;
 const smallBase =
   "inline-flex min-h-10 items-center justify-center gap-1.5 rounded-lg border-[1.5px] border-stone-300 bg-white px-3 text-base font-semibold hover:bg-stone-100 max-lg:min-h-11";

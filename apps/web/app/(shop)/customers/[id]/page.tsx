@@ -288,7 +288,7 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
             <input name="address" defaultValue={customer.address ?? ""} maxLength={300} className="field" />
           </Field>
           <div>
-            <button type="submit" className="button-primary">
+            <button type="submit" className="button-primary max-md:w-full">
               {t("common.save")}
             </button>
           </div>

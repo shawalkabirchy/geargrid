@@ -2,7 +2,7 @@ import Link from "next/link";
 import { database } from "../../../src/server/db";
 import { listSuppliers } from "../../../src/server/services/party-reads";
 import { pageContext } from "../../../src/web/page-context";
-import { ButtonLink, cell, Field, money, PageHead, Table } from "../ui";
+import { ButtonLink, cell, Field, money, PageHead, RowCard, Table } from "../ui";
 
 // Suppliers with what the shop owes each (GearGrid plan 2.7, 8.1), the biggest first.
 
@@ -21,20 +21,36 @@ export default async function SuppliersPage({ searchParams }: { searchParams: Se
       </PageHead>
       <form className="card mb-4 flex flex-wrap items-end gap-3" role="search">
         <Field label={t("customers.search_label")} className="min-w-64 flex-1">
-          <input name="q" defaultValue={q} className="field" />
+          <input enterKeyHint="search" name="q" defaultValue={q} className="field" />
         </Field>
-        <button type="submit" className="button-primary">
+        <button type="submit" className="button-primary max-md:w-full">
           {t("form.search")}
         </button>
       </form>
-      <section className="card">
+      <section className="card max-md:border-0 max-md:bg-transparent max-md:p-0">
         <p className="mb-2 text-lg">
           {t("suppliers.total_payable")}: <strong data-testid="total-payable">{taka(total)}</strong>
         </p>
         {suppliers.length === 0 ? (
           <p className="text-stone-600">{t("suppliers.none")}</p>
         ) : (
-          <Table right={[2]} head={[t("fields.name"), t("fields.phone"), t("suppliers.payable")]}>
+          <Table
+            right={[2]}
+            head={[t("fields.name"), t("fields.phone"), t("suppliers.payable")]}
+            cards={suppliers.map((s) => (
+              <RowCard
+                key={s.id}
+                href={`/suppliers/${s.id}`}
+                title={s.name}
+                amount={
+                  <span className={BigInt(s.payable_balance) > 0n ? "text-red-700" : "text-stone-500"}>
+                    {taka(BigInt(s.payable_balance))}
+                  </span>
+                }
+                sub={s.phone ?? undefined}
+              />
+            ))}
+          >
             {suppliers.map((s) => (
               <tr key={s.id}>
                 <td className={cell}>

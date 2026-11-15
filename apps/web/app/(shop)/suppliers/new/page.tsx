@@ -14,13 +14,13 @@ export default async function NewSupplierPage() {
           <input name="name" required maxLength={100} className="field" />
         </Field>
         <Field label={f("phone")} hint={t("form.optional")}>
-          <input name="phone" maxLength={20} inputMode="tel" className="field" />
+          <input name="phone" type="tel" maxLength={20} inputMode="tel" className="field" />
         </Field>
         <Field label={f("address")} hint={t("form.optional")} className="md:col-span-2">
           <input name="address" maxLength={300} className="field" />
         </Field>
         <div>
-          <button type="submit" className="button-primary">
+          <button type="submit" className="button-primary max-md:w-full">
             {t("common.save")}
           </button>
         </div>

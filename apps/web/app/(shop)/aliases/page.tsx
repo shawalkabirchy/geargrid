@@ -4,7 +4,7 @@ import { categoryOptions, listAliases } from "../../../src/server/services/catal
 import { pageContext } from "../../../src/web/page-context";
 import { ActionForm } from "../action-form";
 import { addAliasAction, removeAliasAction } from "../catalog-actions";
-import { cell, Field, PageHead, small, Table } from "../ui";
+import { cell, Field, PageHead, RowCard, small, Table } from "../ui";
 
 // Shop words (GearGrid plan 2.3): the names the shop calls parts by. A category word finds every part in it; a part's
 // own words are added on its page. DokaanBondhu AI reads the same list (part_aliases).
@@ -41,8 +41,38 @@ export default async function AliasesPage() {
           </button>
         </ActionForm>
       </section>
-      <section className="card">
-        <Table head={[t("fields.aliasText"), t("aliases.target"), ""]}>
+      <section className="card max-md:border-0 max-md:bg-transparent max-md:p-0">
+        <Table
+          head={[t("fields.aliasText"), t("aliases.target"), ""]}
+          cards={aliases.map((alias) => (
+            <RowCard
+              key={alias.id}
+              title={alias.alias_text}
+              sub={
+                <>
+                  {alias.part_id ? (
+                    <Link href={`/parts/${alias.part_id}`} className="text-brand-ink underline">
+                      {alias.target}
+                    </Link>
+                  ) : (
+                    alias.target
+                  )}
+                  <span className="ml-2 text-sm text-stone-500">
+                    {t(alias.part_id ? "aliases.for_part" : "aliases.for_category")}
+                  </span>
+                </>
+              }
+              side={
+                <ActionForm action={removeAliasAction} className="inline">
+                  <input type="hidden" name="id" value={alias.id} />
+                  <button type="submit" className={small}>
+                    {t("form.remove")}
+                  </button>
+                </ActionForm>
+              }
+            />
+          ))}
+        >
           {aliases.map((alias) => (
             <tr key={alias.id}>
               <td className={`${cell} font-medium`}>{alias.alias_text}</td>

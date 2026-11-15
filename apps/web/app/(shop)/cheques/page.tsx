@@ -6,7 +6,7 @@ import { allAccounts, listCheques } from "../../../src/server/services/money";
 import { pageContext } from "../../../src/web/page-context";
 import { ActionForm } from "../action-form";
 import { moveChequeAction } from "../money-actions";
-import { cell, money, PageHead, small, smallDanger, Table } from "../ui";
+import { Badge, cell, money, PageHead, RowCard, small, smallDanger, Table } from "../ui";
 
 // The cheque register (GearGrid plan 2.8, 2.11): cheques received from customers and issued to suppliers; a pending
 // one is deposited, cleared into or out of a bank account, or bounced (its amount goes back on the ledger).
@@ -23,6 +23,46 @@ export default async function ChequesPage({ searchParams }: { searchParams: Sear
   const banks = accounts.filter((a) => a.kind === "bank" && a.is_active);
   const today = dhakaDate(new Date());
 
+  // What can be done with an open cheque, the same on the computer's row and on the phone's card (D243).
+  const actions = (c: (typeof rows)[number]) => (
+    <div className="flex flex-col items-start gap-2 max-md:items-stretch">
+      {c.direction === "received" && c.status === "pending" && (
+        <ActionForm action={moveChequeAction} className="inline">
+          <input type="hidden" name="id" value={c.id} />
+          <input type="hidden" name="action" value="deposit" />
+          <button type="submit" className={small}>
+            {t("cheques.deposit")}
+          </button>
+        </ActionForm>
+      )}
+      <ActionForm action={moveChequeAction} className="flex flex-col items-start gap-2 max-md:items-stretch">
+        <input type="hidden" name="id" value={c.id} />
+        <input type="hidden" name="action" value="clear" />
+        <select
+          name="accountId"
+          aria-label={t("cheques.into_account")}
+          className="field mt-0 min-h-10 w-44 text-base max-lg:min-h-11 max-md:w-full"
+        >
+          {banks.map((a) => (
+            <option key={a.id} value={a.id}>
+              {a.name}
+            </option>
+          ))}
+        </select>
+        <button type="submit" className={small}>
+          {t("cheques.clear")}
+        </button>
+      </ActionForm>
+      <ActionForm action={moveChequeAction} className="inline">
+        <input type="hidden" name="id" value={c.id} />
+        <input type="hidden" name="action" value="bounce" />
+        <button type="submit" className={smallDanger}>
+          {t("cheques.bounce")}
+        </button>
+      </ActionForm>
+    </div>
+  );
+
   return (
     <div className="space-y-6">
       <PageHead title={t("cheques.title")} />
@@ -31,14 +71,14 @@ export default async function ChequesPage({ searchParams }: { searchParams: Sear
           <Link
             key={s ?? "all"}
             href={s ? `/cheques?status=${s}` : "/cheques"}
-            className={`rounded-lg px-3 py-1.5 ${s === status ? "bg-brand text-white" : "border border-stone-300 hover:bg-stone-100"}`}
+            className={`rounded-lg px-3 py-1.5 max-lg:inline-flex max-lg:min-h-11 max-lg:items-center ${s === status ? "bg-brand text-white" : "border border-stone-300 hover:bg-stone-100"}`}
           >
             {s ? t(`value.cheque_status.${s}`) : t("cheques.all")}
           </Link>
         ))}
       </nav>
       <p className="text-stone-600">{t("cheques.bounce_hint")}</p>
-      <section className="card">
+      <section className="card max-md:border-0 max-md:bg-transparent max-md:p-0">
         {rows.length === 0 ? (
           <p className="text-stone-600">{t("cheques.none")}</p>
         ) : (
@@ -53,6 +93,33 @@ export default async function ChequesPage({ searchParams }: { searchParams: Sear
               t("cheques.status"),
               "",
             ]}
+            cards={rows.map((c) => {
+              const isOpen = c.status === "pending" || c.status === "deposited";
+              return (
+                <RowCard
+                  key={c.id}
+                  title={
+                    <Link
+                      href={`/${c.party_type === "customer" ? "customers" : "suppliers"}/${c.party_id}`}
+                      className="text-brand-ink hover:underline"
+                    >
+                      {c.party}
+                    </Link>
+                  }
+                  amount={taka(BigInt(c.amount))}
+                  sub={`${t(`value.cheque_direction.${c.direction}`)} · ${c.bank} ${c.cheque_no}`}
+                  side={
+                    <span className="flex items-center gap-2 whitespace-nowrap">
+                      <span className={isOpen && c.due_date < today ? "font-semibold text-red-700" : ""}>
+                        {date(c.due_date)}
+                      </span>
+                      <Badge>{t(`value.cheque_status.${c.status}`)}</Badge>
+                    </span>
+                  }
+                  extra={isOpen ? <div className="mt-2">{actions(c)}</div> : undefined}
+                />
+              );
+            })}
           >
             {rows.map((c) => {
               const open = c.status === "pending" || c.status === "deposited";
@@ -75,46 +142,7 @@ export default async function ChequesPage({ searchParams }: { searchParams: Sear
                   </td>
                   <td className={money}>{taka(BigInt(c.amount))}</td>
                   <td className={cell}>{t(`value.cheque_status.${c.status}`)}</td>
-                  <td className={cell}>
-                    {open && (
-                      <div className="flex flex-col items-start gap-2">
-                        {c.direction === "received" && c.status === "pending" && (
-                          <ActionForm action={moveChequeAction} className="inline">
-                            <input type="hidden" name="id" value={c.id} />
-                            <input type="hidden" name="action" value="deposit" />
-                            <button type="submit" className={small}>
-                              {t("cheques.deposit")}
-                            </button>
-                          </ActionForm>
-                        )}
-                        <ActionForm action={moveChequeAction} className="flex flex-col items-start gap-2">
-                          <input type="hidden" name="id" value={c.id} />
-                          <input type="hidden" name="action" value="clear" />
-                          <select
-                            name="accountId"
-                            aria-label={t("cheques.into_account")}
-                            className="field mt-0 min-h-10 w-44 text-base"
-                          >
-                            {banks.map((a) => (
-                              <option key={a.id} value={a.id}>
-                                {a.name}
-                              </option>
-                            ))}
-                          </select>
-                          <button type="submit" className={small}>
-                            {t("cheques.clear")}
-                          </button>
-                        </ActionForm>
-                        <ActionForm action={moveChequeAction} className="inline">
-                          <input type="hidden" name="id" value={c.id} />
-                          <input type="hidden" name="action" value="bounce" />
-                          <button type="submit" className={smallDanger}>
-                            {t("cheques.bounce")}
-                          </button>
-                        </ActionForm>
-                      </div>
-                    )}
-                  </td>
+                  <td className={cell}>{open && actions(c)}</td>
                 </tr>
               );
             })}

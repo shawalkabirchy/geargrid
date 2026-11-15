@@ -130,4 +130,51 @@ test.describe("logged in", () => {
     await expect(page.getByTestId("part-stock")).toBeVisible();
     await noSidewaysScroll(page);
   });
+
+  test("no other page scrolls sideways either", async ({ page }) => {
+    for (const path of [
+      "/money",
+      "/expenses",
+      "/cheques",
+      "/stock",
+      "/stock/count",
+      "/suppliers",
+      "/suppliers/new",
+      "/customers/new",
+      "/vehicles",
+      "/aliases",
+      "/parts/new",
+      "/reports",
+      "/review",
+      "/import",
+      "/audit",
+      "/settings",
+    ]) {
+      await page.goto(path, { waitUntil: "networkidle" });
+      await noSidewaysScroll(page);
+    }
+    // a record of each kind, opened from its list's first card
+    for (const [list, opened] of [
+      ["/money", /\/money\/[0-9a-f-]{36}$/],
+      ["/suppliers", /\/suppliers\/[0-9a-f-]{36}$/],
+      ["/purchases", /\/purchases\/[0-9a-f-]{36}$/],
+      ["/sales?from=2026-01-01", /\/sales\/[0-9a-f-]{36}$/],
+    ] as const) {
+      await page.goto(list);
+      await page.getByRole("listitem").getByRole("link").first().click();
+      await expect(page).toHaveURL(opened);
+      await page.waitForLoadState("networkidle");
+      await noSidewaysScroll(page);
+    }
+    await page.goto("/parts?q=filter");
+    await page.getByRole("listitem").getByRole("link").first().click();
+    await page.getByRole("link", { name: "পার্ট বদলান" }).click();
+    await expect(page).toHaveURL(/\/edit$/);
+    await noSidewaysScroll(page);
+    await page.goto("/stock/count");
+    await page.locator('select[name="rack"]').selectOption({ index: 1 });
+    await page.getByRole("button", { name: "খুঁজুন" }).click();
+    await expect(page.getByRole("button", { name: /সেভ/ })).toBeVisible();
+    await noSidewaysScroll(page);
+  });
 });
