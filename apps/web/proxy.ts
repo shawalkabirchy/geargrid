@@ -2,8 +2,8 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 // Refreshes the owner's Supabase session cookies before a page renders (server components cannot set cookies).
-// Never runs for /api: the API and DokaanBondhu's calls to it do not pass through here. Without Supabase settings it
-// does nothing.
+// Never runs for /api: the API and DokaanBondhu's calls to it do not pass through here. Nor for the app's manifest and
+// icons, which a phone reads before any login (DokaanBondhu spec D243). Without Supabase settings it does nothing.
 
 export async function proxy(request: NextRequest) {
   const url = process.env.SUPABASE_URL;
@@ -25,5 +25,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!api/|_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/((?!api/|_next/static|_next/image|favicon.ico|manifest.webmanifest|icon/|apple-icon).*)"],
 };

@@ -87,7 +87,8 @@ export function SideMenu({
 
   return (
     <aside className="frame-scroll bg-frame text-frame-text print:hidden lg:sticky lg:top-0 lg:flex lg:h-screen lg:w-64 lg:flex-none lg:flex-col lg:overflow-y-auto">
-      <div className="flex items-center gap-3 px-4 py-3 lg:px-5 lg:pt-6 lg:pb-5">
+      {/* On a phone the bar keeps room for a notch when installed full screen (D243); env() is 0 elsewhere. */}
+      <div className="flex items-center gap-3 px-4 py-3 max-lg:pt-[calc(0.75rem+env(safe-area-inset-top))] lg:px-5 lg:pt-6 lg:pb-5">
         <Link href="/" onClick={close} className={`flex min-w-0 items-center gap-3 ${onFrame}`}>
           <Mark />
           <span className="flex min-w-0 flex-col">
